@@ -1,6 +1,37 @@
 # Mor Airlines — Full Project Execution Contract
 
-> **To Claude reading this:** Build this app end-to-end. Execute phases 0–6 in order. Each phase has a "Done when" checklist — every item must pass before moving to the next phase. When all phases are complete, the app is shipped. The spec detail lives in this document; you do not need another file.
+> **To the agent reading this:** This document is the full product spec, but it is **not** one single Codex goal. Work one phase at a time. The current active state below decides what to do next. Every phase has a "Done when" checklist — every item in the active phase must pass before moving to the next phase.
+
+---
+
+## Active State
+
+- **Pre-flight:** Complete. GitHub, Supabase, Vercel, local env, and shared UUID are already set up.
+- **Phase 0 — Skeleton:** Complete (2026-06-01). Vite + React + TypeScript + Tailwind scaffolded, Hebrew RTL configured, env files correct, build passes, pushed to GitHub → Vercel preview auto-deployed.
+- **Current active phase:** Phase 1 — Static Globe.
+- **Current Codex goal objective:** Render the 3D globe with all 45 seed destinations, home base marker, state-based visual encoding, tooltip behavior, and the "לאן טסים?" button.
+- **Starting build check:** Run `npm run build` before and after meaningful changes.
+- **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
+
+## Goal Feature Usage
+
+Use the Codex goal feature with **one phase-sized goal at a time**. Do not create a single goal for phases 0–6.
+
+| Phase goal | Goal objective | Complete when |
+|---|---|---|
+| Phase 0 — Skeleton | Scaffold the deployable Vite/React/TypeScript/Tailwind app with Hebrew RTL, env examples, strict TypeScript, and an empty Vercel preview. | Every Phase 0 checklist item passes. |
+| Phase 1 — Static Globe | Render the 3D globe with all seed destinations, home base, state-based markers/arcs, tooltip behavior, and mobile-safe layout. | Every Phase 1 checklist item passes. |
+| Phase 2 — Lottery Ceremony | Build the full destination lottery ceremony: sounds, spin/lock, pin drop, reveal, confetti, boarding pass, and re-roll flow. | Every Phase 2 checklist item passes, especially zero network calls during spin/reveal. |
+| Phase 3 — Passport & Local Persistence | Add Zustand persistence, seed override merging, passport navigation, destination states, notes/dates, and reload-safe localStorage behavior. | Every Phase 3 checklist item passes. |
+| Phase 4 — CRUD & External Data | Add destination create/edit/delete, geocoding, Wikipedia image/summary caching, editable vibe tags, and graceful external API failure handling. | Every Phase 4 checklist item passes. |
+| Phase 5 — Supabase Sync | Add background Supabase sync between devices without blocking local-first rendering or the ceremony path. | Every Phase 5 checklist item passes, including two-device sync verification. |
+| Phase 6 — Filters, Polish & PWA | Add filters, PWA installability, offline behavior, mobile polish, sound balance, and final production-readiness checks. | Every Phase 6 checklist item passes and the user explicitly approves any production deploy. |
+
+When a phase is complete:
+1. Update **Active State** to the next phase.
+2. Leave the completed phase checklist checked or add a short completion note.
+3. Commit and push the shippable change.
+4. Start a new Codex goal for the next phase.
 
 ---
 
@@ -143,18 +174,18 @@ All Hebrew content (tagline, localDish, bestSeason, whyHere) should be authentic
 
 ---
 
-## Pre-Flight Checklist (Do Before Phase 0)
+## Pre-Flight Checklist (Complete — Do Not Re-run Unless Verification Fails)
 
 These are manual steps the developer takes before writing code:
 
-- [ ] Create GitHub repo: `mor-airlines` (private)
-- [ ] Create Vercel project → import from GitHub repo
-- [ ] Create Supabase project (free tier)
-- [ ] Generate passport UUID: `node -e "console.log(crypto.randomUUID())"` → save it
-- [ ] Run Supabase schema SQL + insert passport row
-- [ ] Add env vars to Vercel project settings
-- [ ] Create `.env.local` with same vars locally
-- [ ] Confirm: `curl $VITE_SUPABASE_URL/rest/v1/passports?id=eq.$VITE_PASSPORT_UUID` returns the row
+- [x] Create GitHub repo: `mor-airlines` (public)
+- [x] Create Vercel project → import from GitHub repo
+- [x] Create Supabase project (free tier)
+- [x] Generate passport UUID: `node -e "console.log(crypto.randomUUID())"` → save it
+- [x] Run Supabase schema SQL + insert passport row
+- [x] Add env vars to Vercel project settings
+- [x] Create `.env.local` with same vars locally
+- [x] Confirm: `curl $VITE_SUPABASE_URL/rest/v1/passports?id=eq.$VITE_PASSPORT_UUID` returns the row
 
 ---
 
@@ -163,14 +194,14 @@ These are manual steps the developer takes before writing code:
 **Build:** Vite + TypeScript + Tailwind + RTL + empty Vercel deploy
 
 **Done when:**
-- [ ] `npm run dev` starts without errors on port 5173
-- [ ] `npm run build` completes with zero errors
-- [ ] Deployed to Vercel preview URL — URL loads in browser
-- [ ] Page has `<html dir="rtl" lang="he">` in index.html
-- [ ] Hebrew text renders RTL (verify with visible Hebrew heading on screen)
-- [ ] Tailwind classes apply (verify with at least one styled element)
-- [ ] TypeScript strict mode enabled in tsconfig
-- [ ] `.env.local` gitignored, `.env.example` committed with key names and empty values
+- [x] `npm run dev` starts without errors on port 5173
+- [x] `npm run build` completes with zero errors
+- [x] Deployed to Vercel preview URL — URL loads in browser
+- [x] Page has `<html dir="rtl" lang="he">` in index.html
+- [x] Hebrew text renders RTL (verify with visible Hebrew heading on screen)
+- [x] Tailwind classes apply (verify with at least one styled element)
+- [x] TypeScript strict mode enabled in tsconfig
+- [x] `.env.local` gitignored, `.env.example` committed with key names and empty values
 
 ---
 
