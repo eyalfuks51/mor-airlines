@@ -8,7 +8,7 @@ import DestinationModal, { ModalFormData } from './components/DestinationModal';
 import SyncIndicator from './components/SyncIndicator';
 import { CeremonyPhase, TIMINGS } from './utils/ceremony';
 import { playBingBong, startDrumroll, stopDrumroll, playDing, playApplause } from './utils/sounds';
-import { Destination, DestinationState } from './data/destinations';
+import { Destination, DestinationState, VibeTag } from './data/destinations';
 import { usePassportStore, mergeDestinations } from './store/passportStore';
 import { fetchWikiData } from './hooks/wikiData';
 import { useSupabaseSync } from './hooks/useSupabaseSync';
@@ -22,6 +22,10 @@ export default function App() {
   const [addModalOpen, setAddModalOpen] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
+  // Filter state
+  const [activeVibes, setActiveVibes] = useState<VibeTag[]>([]);
+  const [activeState, setActiveState] = useState<DestinationState | 'all'>('all');
+
   const overrides = usePassportStore(s => s.overrides);
   const userDestinations = usePassportStore(s => s.userDestinations);
   const setDestState = usePassportStore(s => s.setDestState);
@@ -34,6 +38,29 @@ export default function App() {
     [overrides, userDestinations],
   );
 
+  const filteredDestinations = useMemo(() => {
+    return destinations.filter(d => {
+      const vibeMatch = activeVibes.length === 0 || activeVibes.some(v => d.vibeTags.includes(v));
+      const stateMatch = activeState === 'all' || d.state === activeState;
+      return vibeMatch && stateMatch;
+    });
+  }, [destinations, activeVibes, activeState]);
+
+  const handleVibeToggle = useCallback((vibe: VibeTag) => {
+    setActiveVibes(prev =>
+      prev.includes(vibe) ? prev.filter(v => v !== vibe) : [...prev, vibe],
+    );
+  }, []);
+
+  const handleStateChange = useCallback((state: DestinationState | 'all') => {
+    setActiveState(state);
+  }, []);
+
+  const handleResetFilters = useCallback(() => {
+    setActiveVibes([]);
+    setActiveState('all');
+  }, []);
+
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
@@ -43,8 +70,14 @@ export default function App() {
     clearTimers();
     stopDrumroll();
 
-    const pool = destinations.filter(d => d.state !== 'visited');
-    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    // Lottery pool respects active filters; exclude visited
+    const pool = filteredDestinations.filter(d => d.state !== 'visited');
+    // Fallback to all non-visited if filter yields empty pool
+    const drawFrom = pool.length > 0
+      ? pool
+      : destinations.filter(d => d.state !== 'visited');
+
+    const chosen = drawFrom[Math.floor(Math.random() * drawFrom.length)];
     setDest(chosen);
     setPhase('spin');
     playBingBong();
@@ -71,7 +104,7 @@ export default function App() {
     }, TIMINGS.SPIN_MS + TIMINGS.LOCK_MS + TIMINGS.PIN_MS + TIMINGS.REVEAL_MS);
 
     timersRef.current = [t1, t2, t3, t4, t5];
-  }, [destinations, clearTimers]);
+  }, [filteredDestinations, destinations, clearTimers]);
 
   const handleReroll = useCallback(() => {
     clearTimers();
@@ -147,12 +180,17 @@ export default function App() {
   return (
     <>
       <GlobeView
-        destinations={destinations}
+        destinations={filteredDestinations}
         onLottery={runCeremony}
         onOpenPassport={() => setView('passport')}
         onAddDestination={() => setAddModalOpen(true)}
         ceremonyPhase={phase}
         selectedDest={dest}
+        activeVibes={activeVibes}
+        activeState={activeState}
+        onVibeToggle={handleVibeToggle}
+        onStateChange={handleStateChange}
+        onResetFilters={handleResetFilters}
       />
 
       <CeremonyOverlay phase={phase} dest={dest} />

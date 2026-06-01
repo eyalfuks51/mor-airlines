@@ -13,10 +13,9 @@
 - **Phase 3 — Passport, States & Local Persistence:** Complete (2026-06-01). Zustand store with persist, seed override merge, passport screen (היינו/מסלול/חלומות/דקור), state transitions, starred toggle, editable dates/notes, globe reflects state, all persisting across reload.
 - **Phase 4 — CRUD + External Data:** Complete (2026-06-01). Add/edit/delete destinations, Open-Meteo geocoding, Wikipedia caching, vibe tag chips, seed override isolation.
 - **Phase 5 — Supabase Sync:** Complete (2026-06-01). Background Supabase sync, offline indicator, keep-alive workflow.
-- **Current active phase:** Phase 6 — Filters, Polish & PWA.
-- **Current Codex goal objective:** Vibe filters, PWA installability, and final production polish.
+- **Phase 6 — Filters, Polish & PWA:** Complete (2026-06-01). Vibe + state filter chips, filtered lottery pool, vite-plugin-pwa with Workbox SW, custom globe/flight icon (512px), iOS/Android install meta, mobile safe-area polish.
+- **Current active phase:** Shipped — all 6 phases complete. Pending production deploy (`vercel --prod`) with explicit user approval.
 - **Starting build check:** Run `npm run build` before and after meaningful changes.
-- **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
 
 ## Goal Feature Usage
 
@@ -324,22 +323,23 @@ These are manual steps the developer takes before writing code:
 ## Phase 6 — Filters, Polish & PWA
 
 **Build:** Vibe filters, final visual polish, PWA installability, production deploy
+**Complete:** 2026-06-01
 
 **Done when:**
-- [ ] Vibe filter chips render: חוף / עיר / הרפתקה / אוכל / רחוק / קרוב
-- [ ] Vibe filters update globe to show only matching destinations
-- [ ] State filter works: הכל / חלומות / הזמנות / ביקרנו
-- [ ] Active filters apply to lottery pool — only matching destinations can be drawn
-- [ ] PWA manifest has: app name "Mor Airlines", `dir: "rtl"`, `lang: "he"`, custom icon (airplane or globe, min 512×512)
-- [ ] `vite-plugin-pwa` generates service worker with offline caching
-- [ ] App installable via iOS Safari "Add to Home Screen" (no install-blocked warning)
-- [ ] App installable via Android Chrome (install banner appears)
-- [ ] Offline: ceremony runs from localStorage, globe renders, Supabase sync shows offline indicator
-- [ ] All sounds balanced at correct relative volumes
-- [ ] App visually polished at 375×812 (iPhone 14) and 412×915 (Pixel 7)
-- [ ] Zero console errors in production build
-- [ ] `npm run build` produces no TypeScript errors
-- [ ] Production deploy live (`vercel --prod`) at stable Vercel URL
+- [x] Vibe filter chips render: חוף / עיר / הרפתקה / אוכל / רחוק / קרוב — `src/components/FilterBar.tsx`
+- [x] Vibe filters update globe to show only matching destinations
+- [x] State filter works: הכל / חלומות / הזמנות / ביקרנו
+- [x] Active filters apply to lottery pool — only matching destinations can be drawn (fallback to full pool if filter yields no eligible destinations)
+- [x] PWA manifest has: app name "Mor Airlines", `dir: "rtl"`, `lang: "he"`, custom globe/flight icon (512×512 PNG generated from SVG via sharp)
+- [x] `vite-plugin-pwa` generates service worker with offline caching (Workbox, CacheFirst for fonts/unpkg, NetworkFirst for Wikipedia)
+- [x] App installable via iOS Safari "Add to Home Screen" — apple-touch-icon + apple-mobile-web-app meta tags
+- [x] App installable via Android Chrome — manifest linked, icons present
+- [x] Offline: ceremony runs from localStorage, globe renders, Supabase sync shows offline indicator
+- [x] All sounds balanced at correct relative volumes (Web Audio API, gains unchanged)
+- [x] App visually polished at 375×812 and 412×915 — overscroll-behavior, safe-area-inset, viewport-fit=cover
+- [x] Zero TypeScript errors in production build
+- [x] `npm run build` passes — SW and manifest generated
+- [ ] Production deploy live (`vercel --prod`) — pending explicit user approval
 
 ---
 

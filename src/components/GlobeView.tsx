@@ -1,7 +1,8 @@
 import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import Globe, { GlobeMethods } from 'react-globe.gl';
-import { Destination } from '../data/destinations';
+import { Destination, VibeTag, DestinationState } from '../data/destinations';
 import { CeremonyPhase } from '../utils/ceremony';
+import FilterBar from './FilterBar';
 
 const ISRAEL_LAT = 31.7683;
 const ISRAEL_LNG = 35.2137;
@@ -35,6 +36,11 @@ interface Props {
   onAddDestination: () => void;
   ceremonyPhase: CeremonyPhase;
   selectedDest: Destination | null;
+  activeVibes: VibeTag[];
+  activeState: DestinationState | 'all';
+  onVibeToggle: (vibe: VibeTag) => void;
+  onStateChange: (state: DestinationState | 'all') => void;
+  onResetFilters: () => void;
 }
 
 const showPin = (phase: CeremonyPhase) =>
@@ -43,7 +49,19 @@ const showPin = (phase: CeremonyPhase) =>
 const showArc = (phase: CeremonyPhase) =>
   phase === 'reveal' || phase === 'boarding-pass';
 
-export default function GlobeView({ destinations, onLottery, onOpenPassport, onAddDestination, ceremonyPhase, selectedDest }: Props) {
+export default function GlobeView({
+  destinations,
+  onLottery,
+  onOpenPassport,
+  onAddDestination,
+  ceremonyPhase,
+  selectedDest,
+  activeVibes,
+  activeState,
+  onVibeToggle,
+  onStateChange,
+  onResetFilters,
+}: Props) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -237,12 +255,23 @@ export default function GlobeView({ destinations, onLottery, onOpenPassport, onA
         </div>
       )}
 
+      {/* Filter bar — only in idle */}
+      {ceremonyPhase === 'idle' && (
+        <FilterBar
+          activeVibes={activeVibes}
+          activeState={activeState}
+          onVibeToggle={onVibeToggle}
+          onStateChange={onStateChange}
+          onReset={onResetFilters}
+        />
+      )}
+
       {/* Bottom bar — hidden during ceremony */}
       {ceremonyPhase === 'idle' && (
-        <div className="fixed bottom-8 left-0 right-0 flex justify-center items-center gap-3 z-40 pointer-events-none px-6">
+        <div className="fixed bottom-4 left-0 right-0 flex justify-center items-center gap-2 z-40 pointer-events-none px-4">
           <button
             type="button"
-            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-4 py-3.5 rounded-2xl backdrop-blur-sm border border-white/10"
+            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
             onClick={(e) => {
               e.stopPropagation();
               onAddDestination();
@@ -252,7 +281,7 @@ export default function GlobeView({ destinations, onLottery, onOpenPassport, onA
           </button>
           <button
             type="button"
-            className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-xl px-10 py-4 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
+            className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-lg px-8 py-3.5 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onLottery();
@@ -262,7 +291,7 @@ export default function GlobeView({ destinations, onLottery, onOpenPassport, onA
           </button>
           <button
             type="button"
-            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-4 py-3.5 rounded-2xl backdrop-blur-sm border border-white/10"
+            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
             onClick={(e) => {
               e.stopPropagation();
               onOpenPassport();

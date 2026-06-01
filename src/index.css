@@ -6,6 +6,15 @@
 
 body {
   font-family: 'Heebo', sans-serif;
+  /* Prevent pull-to-refresh / overscroll on mobile */
+  overscroll-behavior: none;
+}
+
+html, body, #root {
+  height: 100%;
+  /* iOS safe area */
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @keyframes globe-dream-pulse {
@@ -72,3 +81,10 @@ body {
   pointer-events: none;
 }
 
+/* Mobile optimizations for 375px / 412px */
+@media (max-width: 430px) {
+  /* Ensure bottom bar stays within safe area */
+  .fixed.bottom-4 {
+    bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+}
