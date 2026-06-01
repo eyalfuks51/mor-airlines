@@ -1,6 +1,10 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState, useCallback } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Destination } from '../data/destinations';
 import { usePassportStore } from '../store/passportStore';
+import { seedDestinations } from '../data/destinations';
+import DestinationModal, { ModalFormData } from './DestinationModal';
+import { fetchWikiData } from '../hooks/wikiData';
 
 interface Props {
   destinations: Destination[];
@@ -8,13 +12,54 @@ interface Props {
 }
 
 export default function PassportView({ destinations, onBack }: Props) {
-  const { setDestState, toggleStarred, setTravelDate, setVisitedDate, setPersonalNote } =
+  const { setDestState, toggleStarred, setTravelDate, setVisitedDate, setPersonalNote, updateDestination, deleteDestination } =
     usePassportStore();
+
+  const [editingDest, setEditingDest] = useState<Destination | null>(null);
 
   const visited = destinations.filter(d => d.state === 'visited');
   const booked = destinations.filter(d => d.state === 'booked');
   const dream = destinations.filter(d => d.state === 'dream');
   const starred = destinations.filter(d => d.starred);
+
+  const isSeed = useCallback(
+    (id: string) => seedDestinations.some(d => d.id === id),
+    [],
+  );
+
+  const handleEditSave = useCallback(async (data: ModalFormData) => {
+    if (!editingDest) return;
+    const nameEnChanged = editingDest.nameEn !== data.nameEn;
+    let wikiUpdate: { imageUrl?: string; wikiSummary?: string } = {};
+    if (nameEnChanged) {
+      const wiki = await fetchWikiData(data.nameEn).catch(() => null);
+      if (wiki) {
+        wikiUpdate = {
+          imageUrl: wiki.imageUrl ?? undefined,
+          wikiSummary: wiki.wikiSummary || undefined,
+        };
+      }
+    }
+    updateDestination(editingDest.id, {
+      nameHe: data.nameHe,
+      nameEn: data.nameEn,
+      tagline: data.tagline || undefined,
+      localDish: data.localDish || undefined,
+      bestSeason: data.bestSeason || undefined,
+      whyHere: data.whyHere || undefined,
+      vibeTags: data.vibeTags,
+      lat: data.lat,
+      lng: data.lng,
+      ...wikiUpdate,
+    });
+    setEditingDest(null);
+  }, [editingDest, updateDestination]);
+
+  const handleDelete = useCallback(() => {
+    if (!editingDest) return;
+    deleteDestination(editingDest.id);
+    setEditingDest(null);
+  }, [editingDest, deleteDestination]);
 
   return (
     <div
@@ -51,6 +96,7 @@ export default function PassportView({ destinations, onBack }: Props) {
               stampLabel="✓ ביקרנו"
               stampColor="text-green-400 bg-green-400/15 border-green-400/30"
               onToggleStar={() => toggleStarred(d.id)}
+              onEdit={() => setEditingDest(d)}
             >
               <FieldRow label="תאריך ביקור">
                 <input
@@ -88,6 +134,7 @@ export default function PassportView({ destinations, onBack }: Props) {
               stampLabel="✈ הזמנה"
               stampColor="text-blue-400 bg-blue-400/15 border-blue-400/30"
               onToggleStar={() => toggleStarred(d.id)}
+              onEdit={() => setEditingDest(d)}
             >
               <FieldRow label="תאריך יציאה">
                 <input
@@ -125,6 +172,7 @@ export default function PassportView({ destinations, onBack }: Props) {
               key={d.id}
               dest={d}
               onToggleStar={() => toggleStarred(d.id)}
+              onEdit={() => setEditingDest(d)}
             >
               <div className="flex gap-2 mt-3">
                 <button
@@ -168,10 +216,25 @@ export default function PassportView({ destinations, onBack }: Props) {
                   : 'text-yellow-400 bg-yellow-400/15 border-yellow-400/30'
               }
               onToggleStar={() => toggleStarred(d.id)}
+              onEdit={() => setEditingDest(d)}
             />
           ))}
         </Section>
       </div>
+
+      {/* Edit modal */}
+      <AnimatePresence>
+        {editingDest && (
+          <DestinationModal
+            key={editingDest.id}
+            mode="edit"
+            destination={editingDest}
+            onClose={() => setEditingDest(null)}
+            onSave={handleEditSave}
+            onDelete={!isSeed(editingDest.id) ? handleDelete : undefined}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -208,12 +271,13 @@ function Section({
 }
 
 function DestCard({
-  dest, stampLabel, stampColor, onToggleStar, children,
+  dest, stampLabel, stampColor, onToggleStar, onEdit, children,
 }: {
   dest: Destination;
   stampLabel?: string;
   stampColor?: string;
   onToggleStar: () => void;
+  onEdit: () => void;
   children?: ReactNode;
 }) {
   return (
@@ -223,12 +287,20 @@ function DestCard({
           <p className="font-bold text-base leading-tight text-white">{dest.nameHe}</p>
           <p className="text-white/45 text-xs mt-0.5">{dest.nameEn}</p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0 mt-0.5">
+        <div className="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
           {stampLabel && (
             <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${stampColor}`}>
               {stampLabel}
             </span>
           )}
+          <button
+            type="button"
+            onClick={onEdit}
+            className="text-base leading-none transition-all active:scale-90 select-none text-white/25 hover:text-white/70 px-1"
+            aria-label="ערוך יעד"
+          >
+            ✏
+          </button>
           <button
             type="button"
             onClick={onToggleStar}

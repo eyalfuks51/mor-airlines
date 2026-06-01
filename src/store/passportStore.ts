@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { Destination, DestinationState, seedDestinations } from '../data/destinations';
+import { Destination, DestinationState, VibeTag, seedDestinations } from '../data/destinations';
 
 export type UserOverride = {
   state?: DestinationState;
@@ -8,22 +8,38 @@ export type UserOverride = {
   travelDate?: string;
   visitedDate?: string;
   personalNote?: string;
+  nameHe?: string;
+  nameEn?: string;
+  tagline?: string;
+  localDish?: string;
+  bestSeason?: string;
+  whyHere?: string;
+  vibeTags?: VibeTag[];
+  lat?: number;
+  lng?: number;
+  imageUrl?: string;
+  wikiSummary?: string;
   updatedAt: string;
 };
 
 interface PassportStore {
   overrides: Record<string, UserOverride>;
+  userDestinations: Record<string, Destination>;
   setDestState: (id: string, state: DestinationState) => void;
   toggleStarred: (id: string) => void;
   setTravelDate: (id: string, date: string) => void;
   setVisitedDate: (id: string, date: string) => void;
   setPersonalNote: (id: string, note: string) => void;
+  addDestination: (dest: Destination) => void;
+  updateDestination: (id: string, fields: Partial<Destination>) => void;
+  deleteDestination: (id: string) => void;
 }
 
 export const usePassportStore = create<PassportStore>()(
   persist(
     (set, get) => ({
       overrides: {},
+      userDestinations: {},
 
       setDestState(id, state) {
         set(s => ({
@@ -35,9 +51,10 @@ export const usePassportStore = create<PassportStore>()(
       },
 
       toggleStarred(id) {
-        const { overrides } = get();
-        const seed = seedDestinations.find(d => d.id === id);
-        const cur = overrides[id]?.starred ?? seed?.starred ?? false;
+        const { overrides, userDestinations } = get();
+        const seedDest = seedDestinations.find(d => d.id === id);
+        const userDest = userDestinations[id];
+        const cur = overrides[id]?.starred ?? userDest?.starred ?? seedDest?.starred ?? false;
         set(s => ({
           overrides: {
             ...s.overrides,
@@ -72,11 +89,53 @@ export const usePassportStore = create<PassportStore>()(
           },
         }));
       },
+
+      addDestination(dest) {
+        set(s => ({
+          userDestinations: { ...s.userDestinations, [dest.id]: dest },
+        }));
+      },
+
+      updateDestination(id, fields) {
+        const isSeed = seedDestinations.some(d => d.id === id);
+        if (isSeed) {
+          set(s => ({
+            overrides: {
+              ...s.overrides,
+              [id]: { ...s.overrides[id], ...fields, updatedAt: new Date().toISOString() },
+            },
+          }));
+        } else {
+          set(s => {
+            const existing = s.userDestinations[id];
+            if (!existing) return s;
+            return {
+              userDestinations: {
+                ...s.userDestinations,
+                [id]: { ...existing, ...fields, updatedAt: new Date().toISOString() },
+              },
+            };
+          });
+        }
+      },
+
+      deleteDestination(id) {
+        set(s => {
+          const next = { ...s.userDestinations };
+          delete next[id];
+          return { userDestinations: next };
+        });
+      },
     }),
     { name: 'mor-airlines-passport' },
   ),
 );
 
-export function mergeDestinations(overrides: Record<string, UserOverride>): Destination[] {
-  return seedDestinations.map(d => ({ ...d, ...overrides[d.id] }));
+export function mergeDestinations(
+  overrides: Record<string, UserOverride>,
+  userDestinations: Record<string, Destination>,
+): Destination[] {
+  const seedMerged = seedDestinations.map(d => ({ ...d, ...overrides[d.id] }));
+  const userDests = Object.values(userDestinations).map(d => ({ ...d, ...overrides[d.id] }));
+  return [...seedMerged, ...userDests];
 }

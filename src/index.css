@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+.input-field {
+  @apply bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm w-full focus:outline-none focus:border-indigo-500/70 placeholder:text-white/20 transition-colors;
+}
+
 body {
   font-family: 'Heebo', sans-serif;
 }

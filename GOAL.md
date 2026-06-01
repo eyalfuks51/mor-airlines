@@ -11,8 +11,9 @@
 - **Phase 1 — Static Globe:** Complete (2026-06-01). react-globe.gl installed, 45 seed destinations created, globe renders full-viewport with auto-rotation, CSS-pulsing dream dots, Israel home marker, tooltip on click, "לאן טסים?" button, mobile-ready at 375px.
 - **Phase 2 — Lottery Ceremony:** Complete (2026-06-01). Full ceremony sequence built: sounds (Web Audio API), spin/lock/pin-drop/reveal/boarding-pass state machine, confetti, flight arc, framer-motion boarding pass, Wikipedia fetch after slide-in, re-roll, all UI Hebrew RTL.
 - **Phase 3 — Passport, States & Local Persistence:** Complete (2026-06-01). Zustand store with persist, seed override merge, passport screen (היינו/מסלול/חלומות/דקור), state transitions, starred toggle, editable dates/notes, globe reflects state, all persisting across reload.
-- **Current active phase:** Phase 4 — CRUD + External Data.
-- **Current Codex goal objective:** Add/edit/delete destinations, geocoding, Wikipedia caching, vibe tags.
+- **Phase 4 — CRUD + External Data:** Complete (2026-06-01). Add/edit/delete destinations, Open-Meteo geocoding, Wikipedia caching, vibe tag chips, seed override isolation.
+- **Current active phase:** Phase 5 — Supabase Sync.
+- **Current Codex goal objective:** Background Supabase sync between devices.
 - **Starting build check:** Run `npm run build` before and after meaningful changes.
 - **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
 
@@ -284,17 +285,17 @@ These are manual steps the developer takes before writing code:
 **Build:** Add / edit / delete destinations, Wikipedia integration, geocoding
 
 **Done when:**
-- [ ] "+" button opens add-destination modal
-- [ ] Type a place name in modal → Open-Meteo geocoding API returns lat/lng → coordinates auto-fill
-- [ ] On save: Wikipedia image + summary fetched and stored in User layer (cached — never re-fetches for same destination)
-- [ ] New destination immediately visible on globe after save
-- [ ] Edit modal opens for any destination — all fields editable: `nameHe`, `nameEn`, `tagline`, `localDish`, `bestSeason`, `whyHere`, `vibeTags`
-- [ ] Editing a seed destination stores override, does not modify seed file
-- [ ] User-added destinations can be deleted (confirmation required)
-- [ ] Seed destinations cannot be deleted (edit-only)
-- [ ] Vibe tags assignable/editable via tag chips in edit modal
-- [ ] If geocoding fails → show error and let user enter coordinates manually
-- [ ] If Wikipedia unavailable → destination saves without image/summary (graceful degradation)
+- [x] "+" button opens add-destination modal
+- [x] Type a place name in modal → Open-Meteo geocoding API returns lat/lng → coordinates auto-fill
+- [x] On save: Wikipedia image + summary fetched and stored in User layer (cached — never re-fetches for same destination)
+- [x] New destination immediately visible on globe after save
+- [x] Edit modal opens for any destination — all fields editable: `nameHe`, `nameEn`, `tagline`, `localDish`, `bestSeason`, `whyHere`, `vibeTags`
+- [x] Editing a seed destination stores override, does not modify seed file
+- [x] User-added destinations can be deleted (confirmation required)
+- [x] Seed destinations cannot be deleted (edit-only)
+- [x] Vibe tags assignable/editable via tag chips in edit modal
+- [x] If geocoding fails → show error and let user enter coordinates manually
+- [x] If Wikipedia unavailable → destination saves without image/summary (graceful degradation)
 
 ---
 

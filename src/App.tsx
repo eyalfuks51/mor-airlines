@@ -4,10 +4,12 @@ import GlobeView from './components/GlobeView';
 import CeremonyOverlay from './components/CeremonyOverlay';
 import BoardingPass from './components/BoardingPass';
 import PassportView from './components/PassportView';
+import DestinationModal, { ModalFormData } from './components/DestinationModal';
 import { CeremonyPhase, TIMINGS } from './utils/ceremony';
 import { playBingBong, startDrumroll, stopDrumroll, playDing, playApplause } from './utils/sounds';
 import { Destination, DestinationState } from './data/destinations';
 import { usePassportStore, mergeDestinations } from './store/passportStore';
+import { fetchWikiData } from './hooks/wikiData';
 
 type AppView = 'globe' | 'passport';
 
@@ -15,11 +17,18 @@ export default function App() {
   const [view, setView] = useState<AppView>('globe');
   const [phase, setPhase] = useState<CeremonyPhase>('idle');
   const [dest, setDest] = useState<Destination | null>(null);
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const overrides = usePassportStore(s => s.overrides);
+  const userDestinations = usePassportStore(s => s.userDestinations);
   const setDestState = usePassportStore(s => s.setDestState);
-  const destinations = useMemo(() => mergeDestinations(overrides), [overrides]);
+  const addDestination = usePassportStore(s => s.addDestination);
+
+  const destinations = useMemo(
+    () => mergeDestinations(overrides, userDestinations),
+    [overrides, userDestinations],
+  );
 
   const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
@@ -85,12 +94,48 @@ export default function App() {
     }
   }, [dest]);
 
+  const handleAddDestination = useCallback(async (data: ModalFormData) => {
+    const wiki = await fetchWikiData(data.nameEn).catch(() => null);
+    const newDest: Destination = {
+      id: crypto.randomUUID(),
+      nameHe: data.nameHe,
+      nameEn: data.nameEn,
+      lat: data.lat,
+      lng: data.lng,
+      tagline: data.tagline || undefined,
+      localDish: data.localDish || undefined,
+      bestSeason: data.bestSeason || undefined,
+      whyHere: data.whyHere || undefined,
+      vibeTags: data.vibeTags,
+      imageUrl: wiki?.imageUrl ?? undefined,
+      wikiSummary: wiki?.wikiSummary || undefined,
+      state: 'dream',
+      starred: false,
+      source: 'user',
+      updatedAt: new Date().toISOString(),
+    };
+    addDestination(newDest);
+    setAddModalOpen(false);
+  }, [addDestination]);
+
   if (view === 'passport') {
     return (
-      <PassportView
-        destinations={destinations}
-        onBack={() => setView('globe')}
-      />
+      <>
+        <PassportView
+          destinations={destinations}
+          onBack={() => setView('globe')}
+        />
+        <AnimatePresence>
+          {addModalOpen && (
+            <DestinationModal
+              key="add-modal"
+              mode="add"
+              onClose={() => setAddModalOpen(false)}
+              onSave={handleAddDestination}
+            />
+          )}
+        </AnimatePresence>
+      </>
     );
   }
 
@@ -100,6 +145,7 @@ export default function App() {
         destinations={destinations}
         onLottery={runCeremony}
         onOpenPassport={() => setView('passport')}
+        onAddDestination={() => setAddModalOpen(true)}
         ceremonyPhase={phase}
         selectedDest={dest}
       />
@@ -114,6 +160,17 @@ export default function App() {
             onReroll={handleReroll}
             onSave={handleSave}
             onShare={handleShare}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {addModalOpen && (
+          <DestinationModal
+            key="add-modal"
+            mode="add"
+            onClose={() => setAddModalOpen(false)}
+            onSave={handleAddDestination}
           />
         )}
       </AnimatePresence>

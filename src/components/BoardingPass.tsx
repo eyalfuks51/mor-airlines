@@ -23,10 +23,21 @@ export default function BoardingPass({ destination, onReroll, onSave, onShare }:
   const [saveState, setSaveState] = useState<SaveState>('idle');
 
   useEffect(() => {
-    setWikiLoading(true);
-    setWiki(null);
     setSummaryOpen(false);
     setSaveState('idle');
+
+    // Use cached wiki data for user destinations
+    if (destination.source === 'user' && (destination.imageUrl || destination.wikiSummary)) {
+      setWiki({
+        summary: destination.wikiSummary ?? '',
+        imageUrl: destination.imageUrl ?? null,
+      });
+      setWikiLoading(false);
+      return;
+    }
+
+    setWikiLoading(true);
+    setWiki(null);
     const slug = encodeURIComponent(destination.nameEn.replace(/ /g, '_'));
     fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`)
       .then((r) => {
@@ -43,7 +54,7 @@ export default function BoardingPass({ destination, onReroll, onSave, onShare }:
         setWiki({ summary: '', imageUrl: null });
       })
       .finally(() => setWikiLoading(false));
-  }, [destination.id]);
+  }, [destination.id, destination.imageUrl, destination.wikiSummary]);
 
   const handleSaveChoice = (state: DestinationState) => {
     onSave(state);

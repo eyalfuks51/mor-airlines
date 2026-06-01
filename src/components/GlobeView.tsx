@@ -32,6 +32,7 @@ interface Props {
   destinations: Destination[];
   onLottery: () => void;
   onOpenPassport: () => void;
+  onAddDestination: () => void;
   ceremonyPhase: CeremonyPhase;
   selectedDest: Destination | null;
 }
@@ -42,7 +43,7 @@ const showPin = (phase: CeremonyPhase) =>
 const showArc = (phase: CeremonyPhase) =>
   phase === 'reveal' || phase === 'boarding-pass';
 
-export default function GlobeView({ destinations, onLottery, onOpenPassport, ceremonyPhase, selectedDest }: Props) {
+export default function GlobeView({ destinations, onLottery, onOpenPassport, onAddDestination, ceremonyPhase, selectedDest }: Props) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -241,23 +242,33 @@ export default function GlobeView({ destinations, onLottery, onOpenPassport, cer
         <div className="fixed bottom-8 left-0 right-0 flex justify-center items-center gap-3 z-40 pointer-events-none px-6">
           <button
             type="button"
-            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-5 py-3.5 rounded-2xl backdrop-blur-sm border border-white/10"
+            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-4 py-3.5 rounded-2xl backdrop-blur-sm border border-white/10"
             onClick={(e) => {
               e.stopPropagation();
-              onOpenPassport();
+              onAddDestination();
             }}
           >
-            📔 הדרכון שלנו
+            + הוסף
           </button>
           <button
             type="button"
-            className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-xl px-12 py-4 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
+            className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-xl px-10 py-4 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
               onLottery();
             }}
           >
             לאן טסים?
+          </button>
+          <button
+            type="button"
+            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-4 py-3.5 rounded-2xl backdrop-blur-sm border border-white/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenPassport();
+            }}
+          >
+            📔 דרכון
           </button>
         </div>
       )}
