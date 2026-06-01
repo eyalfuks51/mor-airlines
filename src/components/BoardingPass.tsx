@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Destination, DestinationState } from '../data/destinations';
 import { usePassportStore } from '../store/passportStore';
+import { fetchWikiData } from '../hooks/wikiData';
 
 interface Props {
   destination: Destination;
@@ -41,15 +42,10 @@ export default function BoardingPass({ destination, onReroll, onSave, onShare, o
 
     setWikiLoading(true);
     setWiki(null);
-    const slug = encodeURIComponent(destination.nameEn.replace(/ /g, '_'));
-    fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`)
-      .then((r) => {
-        if (!r.ok) throw new Error('not found');
-        return r.json();
-      })
+    fetchWikiData(destination.nameEn)
       .then((data) => {
-        const imageUrl: string | null = data.thumbnail?.source ?? null;
-        const wikiSummary: string = data.extract || '';
+        const imageUrl = data?.imageUrl ?? null;
+        const wikiSummary = data?.wikiSummary ?? '';
         setWiki({ summary: wikiSummary, imageUrl });
         updateDestination(destination.id, { imageUrl: imageUrl ?? undefined, wikiSummary: wikiSummary || undefined });
       })
