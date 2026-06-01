@@ -44,10 +44,10 @@ export default function FilterBar({ activeVibes, activeState, onVibeToggle, onSt
               type="button"
               onClick={(e) => { e.stopPropagation(); onVibeToggle(vibe); }}
               className={[
-                'px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 pointer-events-auto',
+                'font-stamp px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 pointer-events-auto',
                 active
-                  ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/40'
-                  : 'bg-black/40 text-white/60 border border-white/15 backdrop-blur-sm',
+                  ? 'bg-[color:var(--paper)] text-[color:var(--ink)] shadow-lg'
+                  : 'bg-black/40 text-white/65 border border-white/15',
               ].join(' ')}
             >
               {VIBE_LABELS[vibe]}
@@ -66,10 +66,10 @@ export default function FilterBar({ activeVibes, activeState, onVibeToggle, onSt
               type="button"
               onClick={(e) => { e.stopPropagation(); onStateChange(opt.value); }}
               className={[
-                'px-3 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95 pointer-events-auto',
+                'font-stamp px-3 py-1.5 rounded-lg text-xs transition-all active:scale-95 pointer-events-auto',
                 active
-                  ? 'bg-white/20 text-white border border-white/40'
-                  : 'bg-black/30 text-white/50 border border-white/10 backdrop-blur-sm',
+                  ? 'bg-[color:var(--gold)] text-[color:var(--ink)] border border-[color:var(--gold)]'
+                  : 'bg-black/30 text-white/55 border border-white/10',
               ].join(' ')}
             >
               {opt.label}
@@ -80,7 +80,7 @@ export default function FilterBar({ activeVibes, activeState, onVibeToggle, onSt
           <button
             type="button"
             onClick={(e) => { e.stopPropagation(); onReset(); }}
-            className="px-3 py-1.5 rounded-full text-xs font-bold text-rose-400 border border-rose-400/30 bg-rose-500/10 backdrop-blur-sm active:scale-95 pointer-events-auto transition-all"
+            className="font-stamp px-3 py-1.5 rounded-lg text-xs text-rose-300 border border-rose-300/35 bg-rose-500/10 active:scale-95 pointer-events-auto transition-all"
           >
             × איפוס
           </button>

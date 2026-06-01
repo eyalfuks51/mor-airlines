@@ -63,20 +63,20 @@ export default function PassportView({ destinations, onBack }: Props) {
 
   return (
     <div
-      className="min-h-screen bg-slate-950 text-white overflow-y-auto"
+      className="passport-page overflow-y-auto"
       style={{ direction: 'rtl' }}
     >
       {/* Sticky header */}
-      <div className="sticky top-0 z-10 bg-slate-900/95 backdrop-blur-sm border-b border-white/10">
+      <div className="passport-header sticky top-0 z-10">
         <div className="flex items-center px-4 py-3 gap-2">
           <button
             type="button"
             onClick={onBack}
-            className="text-indigo-400 font-medium text-sm whitespace-nowrap"
+            className="text-[color:var(--gold)] font-bold text-sm whitespace-nowrap"
           >
-            🌍 חזרה לגלובוס
+            חזרה לגלובוס
           </button>
-          <h1 className="flex-1 text-center font-bold text-base">✈ הדרכון שלנו</h1>
+          <h1 className="font-stamp flex-1 text-center text-lg text-[color:var(--paper)]">הדרכון שלנו</h1>
           <div className="w-28 flex-shrink-0" />
         </div>
       </div>
@@ -85,7 +85,7 @@ export default function PassportView({ destinations, onBack }: Props) {
         {/* היינו — visited */}
         <Section
           title="היינו"
-          icon="🌍"
+          icon="חותמות"
           count={visited.length}
           empty="עדיין לא ביקרתם בשום מקום — בקרוב!"
         >
@@ -93,8 +93,8 @@ export default function PassportView({ destinations, onBack }: Props) {
             <DestCard
               key={d.id}
               dest={d}
-              stampLabel="✓ ביקרנו"
-              stampColor="text-green-400 bg-green-400/15 border-green-400/30"
+              stampLabel="ביקרנו"
+              stampColor="stamp-green"
               onToggleStar={() => toggleStarred(d.id)}
               onEdit={() => setEditingDest(d)}
             >
@@ -104,7 +104,7 @@ export default function PassportView({ destinations, onBack }: Props) {
                   dir="ltr"
                   value={d.visitedDate ?? ''}
                   onChange={e => setVisitedDate(d.id, e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm w-full focus:outline-none focus:border-indigo-500"
+                  className="passport-input"
                 />
               </FieldRow>
               <FieldRow label="זיכרון אישי">
@@ -113,7 +113,7 @@ export default function PassportView({ destinations, onBack }: Props) {
                   onChange={e => setPersonalNote(d.id, e.target.value)}
                   placeholder="כתוב/י זיכרון קטן מהטיול..."
                   rows={2}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm resize-none focus:outline-none focus:border-indigo-500 placeholder:text-white/25"
+                  className="passport-input resize-none"
                 />
               </FieldRow>
             </DestCard>
@@ -131,8 +131,8 @@ export default function PassportView({ destinations, onBack }: Props) {
             <DestCard
               key={d.id}
               dest={d}
-              stampLabel="✈ הזמנה"
-              stampColor="text-blue-400 bg-blue-400/15 border-blue-400/30"
+              stampLabel="הזמנה"
+              stampColor="stamp-blue"
               onToggleStar={() => toggleStarred(d.id)}
               onEdit={() => setEditingDest(d)}
             >
@@ -142,15 +142,15 @@ export default function PassportView({ destinations, onBack }: Props) {
                   dir="ltr"
                   value={d.travelDate ?? ''}
                   onChange={e => setTravelDate(d.id, e.target.value)}
-                  className="bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-white text-sm w-full focus:outline-none focus:border-indigo-500"
+                  className="passport-input"
                 />
               </FieldRow>
               <button
                 type="button"
                 onClick={() => setDestState(d.id, 'visited')}
-                className="w-full mt-3 bg-green-600/20 hover:bg-green-600/30 border border-green-400/30 text-green-400 text-sm font-bold py-2.5 rounded-xl transition-all active:scale-95"
+                className="passport-action-green w-full mt-3"
               >
-                ✅ ביקרנו! — העבר לזיכרונות
+                ביקרנו, העבר לזיכרונות
               </button>
             </DestCard>
           ))}
@@ -159,11 +159,11 @@ export default function PassportView({ destinations, onBack }: Props) {
         {/* חלומות — dream */}
         <Section
           title="חלומות"
-          icon="💫"
+          icon="יעדים"
           count={dream.length}
           empty={
             visited.length + booked.length === destinations.length
-              ? 'כל החלומות הושגו! 🎉'
+              ? 'כל החלומות הושגו!'
               : 'אין יעדי חלום עדיין'
           }
         >
@@ -178,16 +178,16 @@ export default function PassportView({ destinations, onBack }: Props) {
                 <button
                   type="button"
                   onClick={() => setDestState(d.id, 'booked')}
-                  className="flex-1 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-400/30 text-blue-400 text-sm font-bold py-2.5 rounded-xl transition-all active:scale-95"
+                  className="passport-action-blue flex-1"
                 >
-                  ✈ הזמנתי!
+                  הזמנתי
                 </button>
                 <button
                   type="button"
                   onClick={() => setDestState(d.id, 'visited')}
-                  className="flex-1 bg-green-600/20 hover:bg-green-600/30 border border-green-400/30 text-green-400 text-sm font-bold py-2.5 rounded-xl transition-all active:scale-95"
+                  className="passport-action-green flex-1"
                 >
-                  ✅ ביקרנו!
+                  ביקרנו
                 </button>
               </div>
             </DestCard>
@@ -197,7 +197,7 @@ export default function PassportView({ destinations, onBack }: Props) {
         {/* דקור — starred */}
         <Section
           title="מועדפים"
-          icon="★"
+          icon="דקורים"
           count={starred.length}
           empty="לא הוספתם מועדפים עדיין — לחצו על ★ בכל יעד"
         >
@@ -206,14 +206,14 @@ export default function PassportView({ destinations, onBack }: Props) {
               key={d.id}
               dest={d}
               stampLabel={
-                d.state === 'visited' ? '✓ ביקרנו' : d.state === 'booked' ? '✈ הזמנה' : '💫 חלום'
+                d.state === 'visited' ? 'ביקרנו' : d.state === 'booked' ? 'הזמנה' : 'חלום'
               }
               stampColor={
                 d.state === 'visited'
-                  ? 'text-green-400 bg-green-400/15 border-green-400/30'
+                  ? 'stamp-green'
                   : d.state === 'booked'
-                  ? 'text-blue-400 bg-blue-400/15 border-blue-400/30'
-                  : 'text-yellow-400 bg-yellow-400/15 border-yellow-400/30'
+                  ? 'stamp-blue'
+                  : 'stamp-gold'
               }
               onToggleStar={() => toggleStarred(d.id)}
               onEdit={() => setEditingDest(d)}
@@ -251,16 +251,16 @@ function Section({
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
-        <span className="text-xl">{icon}</span>
-        <h2 className="text-white font-bold text-lg">{title}</h2>
+        <h2 className="font-airline text-[color:var(--paper)] text-lg">{title}</h2>
+        <span className="font-stamp text-[color:var(--gold)] text-sm">{icon}</span>
         {count > 0 && (
-          <span className="bg-white/10 text-white/50 text-xs px-2 py-0.5 rounded-full">
+          <span className="rounded-full border border-white/15 bg-white/10 text-white/70 text-xs px-2 py-0.5">
             {count}
           </span>
         )}
       </div>
       {count === 0 ? (
-        <p className="text-white/30 text-sm text-center py-6 bg-white/[0.03] rounded-2xl border border-white/5">
+        <p className="passport-empty text-sm text-center py-6">
           {empty}
         </p>
       ) : (
@@ -281,31 +281,31 @@ function DestCard({
   children?: ReactNode;
 }) {
   return (
-    <div className="bg-white/[0.05] rounded-2xl p-4 border border-white/[0.08]">
+    <div className="passport-card p-4">
       <div className="flex items-start justify-between gap-2 mb-1">
         <div className="flex-1 min-w-0">
-          <p className="font-bold text-base leading-tight text-white">{dest.nameHe}</p>
-          <p className="text-white/45 text-xs mt-0.5">{dest.nameEn}</p>
+          <p className="font-airline text-base leading-tight text-[color:var(--ink)]">{dest.nameHe}</p>
+          <p className="font-stamp text-[color:var(--stamp-blue)] text-xs mt-0.5">{dest.nameEn}</p>
         </div>
         <div className="flex items-center gap-1.5 flex-shrink-0 mt-0.5">
           {stampLabel && (
-            <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${stampColor}`}>
+            <span className={`stamp-pill ${stampColor}`}>
               {stampLabel}
             </span>
           )}
           <button
             type="button"
             onClick={onEdit}
-            className="text-base leading-none transition-all active:scale-90 select-none text-white/25 hover:text-white/70 px-1"
+            className="font-stamp text-xs leading-none transition-all active:scale-90 select-none text-[color:var(--ink-muted)] hover:text-[color:var(--ink)] px-1"
             aria-label="ערוך יעד"
           >
-            ✏
+            ערוך
           </button>
           <button
             type="button"
             onClick={onToggleStar}
             className="text-xl leading-none transition-all active:scale-90 select-none"
-            style={{ color: dest.starred ? '#FF69B4' : 'rgba(255,255,255,0.2)' }}
+            style={{ color: dest.starred ? 'oklch(0.58 0.22 355)' : 'color-mix(in oklch, var(--ink-muted) 36%, transparent)' }}
             aria-label={dest.starred ? 'הסר ממועדפים' : 'הוסף למועדפים'}
           >
             ★
@@ -313,7 +313,7 @@ function DestCard({
         </div>
       </div>
       {dest.tagline && (
-        <p className="text-white/35 text-xs italic mt-0.5">{dest.tagline}</p>
+        <p className="text-[color:var(--ink-muted)] text-xs mt-0.5">{dest.tagline}</p>
       )}
       {children}
     </div>
@@ -323,7 +323,7 @@ function DestCard({
 function FieldRow({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="mt-2">
-      <p className="text-white/35 text-xs mb-1">{label}</p>
+      <p className="artifact-label text-xs mb-1">{label}</p>
       {children}
     </div>
   );

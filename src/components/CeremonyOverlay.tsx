@@ -56,16 +56,16 @@ export default function CeremonyOverlay({ phase, dest }: Props) {
             style={{ paddingBottom: phase === 'boarding-pass' ? '55vh' : '0' }}
           >
             <p
-              className="text-white font-black drop-shadow-2xl text-center px-6"
+              className="font-airline text-[color:var(--paper)] drop-shadow-2xl text-center px-6"
               style={{
-                fontSize: 'clamp(2.5rem, 10vw, 5rem)',
+                fontSize: 'clamp(2.6rem, 10vw, 5.25rem)',
                 textShadow: '0 0 40px rgba(255,215,0,0.6), 0 4px 16px rgba(0,0,0,0.8)',
               }}
             >
               {dest.nameHe}
             </p>
             <p
-              className="text-indigo-300 font-mono mt-2 text-center"
+              className="font-stamp text-[color:var(--gold)] mt-2 text-center"
               style={{ fontSize: 'clamp(1rem, 4vw, 1.5rem)' }}
             >
               {dest.nameEn}

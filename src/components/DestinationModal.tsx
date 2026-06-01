@@ -132,7 +132,7 @@ export default function DestinationModal({ mode, destination, onClose, onSave, o
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-[100] bg-black/70 backdrop-blur-sm flex items-end sm:items-center justify-center"
+      className="fixed inset-0 z-[100] bg-black/70 flex items-end sm:items-center justify-center"
       style={{ direction: 'rtl' }}
       onClick={onClose}
     >
@@ -141,26 +141,26 @@ export default function DestinationModal({ mode, destination, onClose, onSave, o
         animate={{ y: 0 }}
         exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 30, stiffness: 250 }}
-        className="bg-slate-900 rounded-t-3xl sm:rounded-3xl w-full max-w-lg border border-white/10 max-h-[92vh] overflow-y-auto"
+        className="bg-[color:var(--night)] rounded-t-2xl sm:rounded-2xl w-full max-w-lg border border-white/10 max-h-[92vh] overflow-y-auto"
         onClick={e => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="sticky top-0 bg-slate-900/95 backdrop-blur-sm border-b border-white/10 flex items-center justify-between px-5 py-4 z-10">
+        <div className="sticky top-0 bg-[color:var(--night)] border-b border-white/10 flex items-center justify-between px-5 py-4 z-10">
           <button
             type="button"
             onClick={onClose}
-            className="text-white/50 hover:text-white text-sm transition-colors"
+            className="text-white/55 hover:text-white text-sm transition-colors"
           >
             ✕ ביטול
           </button>
-          <h2 className="font-bold text-white text-base">
+          <h2 className="font-airline text-white text-base">
             {mode === 'add' ? '+ הוסף יעד חדש' : '✏ עריכת יעד'}
           </h2>
           <button
             type="button"
             onClick={handleSave}
             disabled={!isValid || saving}
-            className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed text-white text-sm font-bold px-4 py-2 rounded-xl transition-all active:scale-95"
+            className="bg-[color:var(--gold)] hover:bg-amber-300 disabled:opacity-40 disabled:cursor-not-allowed text-[color:var(--ink)] text-sm font-bold px-4 py-2 rounded-lg transition-all active:scale-95"
           >
             {saving ? '...' : 'שמור'}
           </button>
@@ -208,7 +208,7 @@ export default function DestinationModal({ mode, destination, onClose, onSave, o
 
           {/* Coordinates */}
           <div>
-            <p className="text-white/40 text-xs mb-2">קואורדינטות</p>
+            <p className="font-stamp text-white/50 text-xs mb-2">קואורדינטות</p>
             <div className="grid grid-cols-2 gap-2">
               <FieldGroup label="קו רוחב (lat)">
                 <input
@@ -275,16 +275,16 @@ export default function DestinationModal({ mode, destination, onClose, onSave, o
 
           {/* Vibe tags */}
           <div>
-            <p className="text-white/40 text-xs mb-2">תגיות</p>
+            <p className="font-stamp text-white/50 text-xs mb-2">תגיות</p>
             <div className="flex flex-wrap gap-2">
               {ALL_TAGS.map(tag => (
                 <button
                   key={tag}
                   type="button"
                   onClick={() => toggleTag(tag)}
-                  className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all active:scale-95 border ${
+                  className={`font-stamp px-3 py-1.5 rounded-lg text-sm transition-all active:scale-95 border ${
                     vibeTags.includes(tag)
-                      ? 'bg-indigo-600 text-white border-indigo-400'
+                      ? 'bg-[color:var(--paper)] text-[color:var(--ink)] border-[color:var(--paper)]'
                       : 'bg-white/[0.07] text-white/60 border-white/10 hover:bg-white/15'
                   }`}
                 >
@@ -350,7 +350,7 @@ function FieldGroup({
   return (
     <div>
       <div className="flex items-center justify-between mb-1.5">
-        <p className="text-white/40 text-xs">{label}</p>
+        <p className="font-stamp text-white/50 text-xs">{label}</p>
         {hint && (
           <p className={`text-xs ${hintError ? 'text-yellow-400' : 'text-white/40'}`}>{hint}</p>
         )}

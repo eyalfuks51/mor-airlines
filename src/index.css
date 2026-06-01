@@ -1,13 +1,80 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Mor Leon";
+  src: url("/fonts/Leon-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mor Leon";
+  src: url("/fonts/Leon-Heavy.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Mor Danidin";
+  src: url("/fonts/Danidin-CondensedBold.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-ui: "Mor Leon", "Segoe UI", Arial, sans-serif;
+  --font-display: "Mor Leon", "Segoe UI", Arial, sans-serif;
+  --font-stamp: "Mor Danidin", "Mor Leon", "Arial Narrow", sans-serif;
+
+  --ink: oklch(0.18 0.035 235);
+  --ink-muted: oklch(0.42 0.025 235);
+  --night: oklch(0.16 0.035 255);
+  --night-2: oklch(0.22 0.04 178);
+  --paper: oklch(0.94 0.028 82);
+  --paper-warm: oklch(0.9 0.04 78);
+  --paper-line: oklch(0.74 0.045 82);
+  --stamp-red: oklch(0.56 0.17 27);
+  --stamp-blue: oklch(0.51 0.12 230);
+  --stamp-green: oklch(0.52 0.13 154);
+  --gold: oklch(0.78 0.15 82);
+}
+
 .input-field {
-  @apply bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-white text-sm w-full focus:outline-none focus:border-indigo-500/70 placeholder:text-white/20 transition-colors;
+  @apply border px-3 py-2.5 text-sm w-full focus:outline-none transition-colors;
+  background: color-mix(in oklch, var(--night) 88%, white 12%);
+  border-color: color-mix(in oklch, var(--paper) 16%, transparent);
+  border-radius: 0.7rem;
+  color: var(--paper);
+  font-family: var(--font-ui);
+}
+
+.input-field:focus {
+  border-color: color-mix(in oklch, var(--gold) 75%, white 25%);
+}
+
+.input-field::placeholder {
+  color: color-mix(in oklch, var(--paper) 38%, transparent);
 }
 
 body {
-  font-family: 'Heebo', sans-serif;
+  margin: 0;
+  font-family: var(--font-ui);
+  color: var(--paper);
+  background: var(--night);
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
   /* Prevent pull-to-refresh / overscroll on mobile */
   overscroll-behavior: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
 }
 
 html, body, #root {
@@ -15,6 +82,190 @@ html, body, #root {
   /* iOS safe area */
   padding-top: env(safe-area-inset-top);
   padding-bottom: env(safe-area-inset-bottom);
+}
+
+.font-airline {
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.font-stamp {
+  font-family: var(--font-stamp);
+  font-weight: 700;
+  letter-spacing: 0;
+}
+
+.artifact-label {
+  font-family: var(--font-stamp);
+  letter-spacing: 0;
+  color: color-mix(in oklch, var(--ink-muted) 92%, var(--stamp-blue) 8%);
+}
+
+.boarding-pass-ticket {
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--stamp-blue) 18%, transparent) 0 1px, transparent 1px 100%),
+    repeating-linear-gradient(0deg, color-mix(in oklch, var(--paper-line) 18%, transparent) 0 1px, transparent 1px 18px),
+    radial-gradient(circle at 12% 10%, color-mix(in oklch, var(--gold) 18%, transparent), transparent 30%),
+    linear-gradient(180deg, var(--paper), var(--paper-warm));
+  border: 1px solid color-mix(in oklch, var(--paper-line) 65%, var(--ink) 35%);
+  border-bottom: 0;
+  border-radius: 1.05rem 1.05rem 0 0;
+  box-shadow: 0 -24px 80px color-mix(in oklch, black 55%, transparent);
+}
+
+.ticket-perforation {
+  border-top: 1px dashed color-mix(in oklch, var(--ink-muted) 36%, transparent);
+  border-bottom: 1px dashed color-mix(in oklch, var(--ink-muted) 24%, transparent);
+}
+
+.ticket-image-frame {
+  border: 1px solid color-mix(in oklch, var(--ink-muted) 20%, transparent);
+  background: color-mix(in oklch, var(--paper-warm) 72%, white 28%);
+}
+
+.ticket-tile {
+  background: color-mix(in oklch, var(--paper) 80%, white 20%);
+  border: 1px solid color-mix(in oklch, var(--paper-line) 62%, transparent);
+  border-radius: 0.65rem;
+}
+
+.ticket-action-primary,
+.ticket-action-secondary,
+.ticket-action-success {
+  border-radius: 0.65rem;
+  min-height: 3rem;
+  transition: transform 160ms ease, background-color 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.ticket-action-primary {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.ticket-action-primary:hover {
+  background: color-mix(in oklch, var(--ink) 88%, var(--stamp-blue) 12%);
+}
+
+.ticket-action-secondary {
+  background: color-mix(in oklch, var(--paper) 76%, white 24%);
+  border: 1px solid color-mix(in oklch, var(--ink-muted) 22%, transparent);
+  color: var(--ink);
+}
+
+.ticket-action-secondary:hover {
+  background: color-mix(in oklch, var(--paper-warm) 88%, white 12%);
+}
+
+.ticket-action-success {
+  background: color-mix(in oklch, var(--stamp-green) 14%, var(--paper) 86%);
+  border: 1px solid color-mix(in oklch, var(--stamp-green) 46%, transparent);
+  color: var(--stamp-green);
+}
+
+.ticket-action-primary:active,
+.ticket-action-secondary:active,
+.ticket-action-success:active {
+  transform: scale(0.97);
+}
+
+.passport-page {
+  min-height: 100vh;
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 80% -10%, color-mix(in oklch, var(--stamp-blue) 18%, transparent), transparent 28rem),
+    linear-gradient(160deg, var(--night), var(--night-2) 58%, oklch(0.18 0.045 42));
+}
+
+.passport-header {
+  background: color-mix(in oklch, var(--night) 88%, black 12%);
+  border-bottom: 1px solid color-mix(in oklch, var(--paper) 13%, transparent);
+}
+
+.passport-card {
+  color: var(--ink);
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--paper-line) 32%, transparent) 0 1px, transparent 1px 100%),
+    linear-gradient(180deg, var(--paper), var(--paper-warm));
+  border: 1px solid color-mix(in oklch, var(--paper-line) 62%, var(--ink) 18%);
+  border-radius: 0.85rem;
+  box-shadow: 0 12px 28px color-mix(in oklch, black 28%, transparent);
+}
+
+.passport-empty {
+  color: color-mix(in oklch, var(--paper) 60%, transparent);
+  background: color-mix(in oklch, var(--paper) 7%, transparent);
+  border: 1px dashed color-mix(in oklch, var(--paper) 18%, transparent);
+  border-radius: 0.85rem;
+}
+
+.passport-input {
+  width: 100%;
+  border-radius: 0.55rem;
+  border: 1px solid color-mix(in oklch, var(--ink-muted) 22%, transparent);
+  background: color-mix(in oklch, var(--paper) 76%, white 24%);
+  color: var(--ink);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.passport-input:focus {
+  border-color: color-mix(in oklch, var(--stamp-blue) 72%, var(--ink) 28%);
+}
+
+.stamp-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.35rem;
+  border: 1px solid currentColor;
+  font-family: var(--font-stamp);
+  font-size: 0.78rem;
+  line-height: 1;
+  padding: 0.22rem 0.45rem;
+  letter-spacing: 0;
+  transform: rotate(-1.5deg);
+}
+
+.stamp-green {
+  color: var(--stamp-green);
+  background: color-mix(in oklch, var(--stamp-green) 9%, transparent);
+}
+
+.stamp-blue {
+  color: var(--stamp-blue);
+  background: color-mix(in oklch, var(--stamp-blue) 9%, transparent);
+}
+
+.stamp-gold {
+  color: oklch(0.53 0.12 75);
+  background: color-mix(in oklch, var(--gold) 11%, transparent);
+}
+
+.passport-action-blue,
+.passport-action-green {
+  border-radius: 0.6rem;
+  border: 1px solid currentColor;
+  font-size: 0.875rem;
+  font-weight: 800;
+  padding: 0.62rem 0.7rem;
+  transition: transform 160ms ease, background-color 160ms ease;
+}
+
+.passport-action-blue {
+  color: var(--stamp-blue);
+  background: color-mix(in oklch, var(--stamp-blue) 10%, transparent);
+}
+
+.passport-action-green {
+  color: var(--stamp-green);
+  background: color-mix(in oklch, var(--stamp-green) 10%, transparent);
+}
+
+.passport-action-blue:active,
+.passport-action-green:active {
+  transform: scale(0.97);
 }
 
 @keyframes globe-dream-pulse {
