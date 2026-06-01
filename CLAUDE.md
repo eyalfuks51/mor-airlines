@@ -8,12 +8,12 @@ React + TypeScript + Vite · react-globe.gl · framer-motion · canvas-confetti 
 
 ## Environment
 
-All vars in `.env.local` (gitignored). Never hardcode.
+All vars in `.env.local` (gitignored). See `.env.example` for key names. Never hardcode values here or in code.
 
 ```
-VITE_SUPABASE_URL        https://jxrlhbxnbjkhobugjzsr.supabase.co
-VITE_SUPABASE_ANON_KEY   see .env.local
-VITE_PASSPORT_UUID       342d922d-b04e-4c8d-abe8-a7cc7d617945
+VITE_SUPABASE_URL
+VITE_SUPABASE_ANON_KEY
+VITE_PASSPORT_UUID
 ```
 
 ## Autonomous CLI Permissions
@@ -39,7 +39,7 @@ Run these without asking for confirmation:
 
 - Remote only — no local Docker
 - Single table: `passports` (id uuid, data jsonb, updated_at timestamptz)
-- One row: UUID `342d922d-b04e-4c8d-abe8-a7cc7d617945`
+- One row — UUID is in `.env.local` as `VITE_PASSPORT_UUID`
 - RLS: anon select/insert/update (intentional — single shared passport, UUID is the secret)
 - Run SQL via: `supabase db push` (migrations) or `curl` to REST API
 - Verify rows: `curl $VITE_SUPABASE_URL/rest/v1/passports -H "apikey: $VITE_SUPABASE_ANON_KEY"`
