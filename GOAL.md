@@ -8,8 +8,9 @@
 
 - **Pre-flight:** Complete. GitHub, Supabase, Vercel, local env, and shared UUID are already set up.
 - **Phase 0 — Skeleton:** Complete (2026-06-01). Vite + React + TypeScript + Tailwind scaffolded, Hebrew RTL configured, env files correct, build passes, pushed to GitHub → Vercel preview auto-deployed.
-- **Current active phase:** Phase 1 — Static Globe.
-- **Current Codex goal objective:** Render the 3D globe with all 45 seed destinations, home base marker, state-based visual encoding, tooltip behavior, and the "לאן טסים?" button.
+- **Phase 1 — Static Globe:** Complete (2026-06-01). react-globe.gl installed, 45 seed destinations created, globe renders full-viewport with auto-rotation, CSS-pulsing dream dots, Israel home marker, tooltip on click, "לאן טסים?" button, mobile-ready at 375px.
+- **Current active phase:** Phase 2 — Lottery Ceremony.
+- **Current Codex goal objective:** Build the full lottery ceremony: sounds, spin/lock, pin drop, reveal, confetti, boarding pass, re-roll.
 - **Starting build check:** Run `npm run build` before and after meaningful changes.
 - **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
 
@@ -210,17 +211,17 @@ These are manual steps the developer takes before writing code:
 **Build:** 3D globe rendering all seed destinations with state-based visual encoding
 
 **Done when:**
-- [ ] Globe renders and auto-rotates slowly (fills full viewport)
-- [ ] All 45 seed destinations visible as points on the globe
-- [ ] Israel marked distinctly as "home base" (e.g. house icon or distinct color)
-- [ ] Dream destinations: pulsing/glowing dot
-- [ ] Starred destinations: pin/heart marker, visually distinct from plain dream
-- [ ] Booked destinations: solid filled circle + arc from Israel in "booked" color
-- [ ] Visited destinations: muted/filled circle + arc in "visited" color, distinct from booked
-- [ ] Click any destination → tooltip shows `nameHe` and `nameEn`
-- [ ] "לאן טסים?" button visible, centered at bottom of globe view
-- [ ] Globe renders correctly on mobile viewport (375px wide)
-- [ ] No console errors in dev mode
+- [x] Globe renders and auto-rotates slowly (fills full viewport)
+- [x] All 45 seed destinations visible as points on the globe
+- [x] Israel marked distinctly as "home base" (orange ✈ dot, htmlElementsData layer)
+- [x] Dream destinations: pulsing/glowing dot (CSS keyframe animation)
+- [x] Starred destinations: pink ★ marker, visually distinct (CSS beat animation)
+- [x] Booked destinations: blue filled circle + arc from Israel (code ready; no booked in seed)
+- [x] Visited destinations: green filled circle + arc (code ready; no visited in seed)
+- [x] Click any destination → tooltip shows `nameHe` and `nameEn`
+- [x] "לאן טסים?" button visible, centered at bottom of globe view
+- [x] Globe renders correctly on mobile viewport (375px wide)
+- [x] No console errors in dev mode
 
 ---
 

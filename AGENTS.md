@@ -6,7 +6,7 @@ See `CLAUDE.md` for full project context, stack, and CLI permissions.
 
 ### Always start a task by
 1. Reading `GOAL.md` to know which phase is active and what "done" looks like
-2. Checking `npm run build` passes before and after changes
+2. Checking `npm run build` passes before and after changes, except before Phase 0 creates `package.json`
 3. Verifying RTL + Hebrew render (no English placeholder text in UI)
 
 ### Deploying
