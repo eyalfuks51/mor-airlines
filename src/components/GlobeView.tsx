@@ -1,6 +1,7 @@
 import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import Globe, { GlobeMethods } from 'react-globe.gl';
 import { seedDestinations, Destination } from '../data/destinations';
+import { CeremonyPhase } from '../utils/ceremony';
 
 const ISRAEL_LAT = 31.7683;
 const ISRAEL_LNG = 35.2137;
@@ -11,6 +12,7 @@ const STATE_COLORS: Record<string, string> = {
   booked: '#38BDF8',
   visited: '#4ADE80',
   israel: '#FF6B35',
+  pin: '#FF3B3B',
 };
 
 type ArcRow = {
@@ -21,9 +23,24 @@ type ArcRow = {
   color: string;
 };
 
-type HtmlPoint = Destination | { id: '__israel__'; lat: number; lng: number };
+type HtmlPoint =
+  | Destination
+  | { id: '__israel__'; lat: number; lng: number }
+  | { id: '__pin__'; lat: number; lng: number };
 
-export default function GlobeView({ onLottery }: { onLottery: () => void }) {
+interface Props {
+  onLottery: () => void;
+  ceremonyPhase: CeremonyPhase;
+  selectedDest: Destination | null;
+}
+
+const showPin = (phase: CeremonyPhase) =>
+  phase === 'pin-drop' || phase === 'reveal' || phase === 'boarding-pass';
+
+const showArc = (phase: CeremonyPhase) =>
+  phase === 'reveal' || phase === 'boarding-pass';
+
+export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Props) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
   const [selected, setSelected] = useState<Destination | null>(null);
@@ -36,27 +53,67 @@ export default function GlobeView({ onLottery }: { onLottery: () => void }) {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  const arcsData = useMemo<ArcRow[]>(
-    () =>
-      seedDestinations
-        .filter((d) => d.state === 'booked' || d.state === 'visited')
-        .map((d) => ({
-          startLat: ISRAEL_LAT,
-          startLng: ISRAEL_LNG,
-          endLat: d.lat,
-          endLng: d.lng,
-          color: d.state === 'booked' ? STATE_COLORS.booked : STATE_COLORS.visited,
-        })),
-    [],
-  );
+  // Globe rotation speed control
+  useEffect(() => {
+    if (!globeRef.current) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const controls = globeRef.current.controls() as any;
+    if (ceremonyPhase === 'idle') {
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.4;
+      globeRef.current.pointOfView({ lat: 25, lng: 20, altitude: 2.5 }, 1800);
+    } else if (ceremonyPhase === 'spin') {
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 4.5;
+    } else if (ceremonyPhase === 'lock') {
+      controls.autoRotate = false;
+      controls.autoRotateSpeed = 0;
+      if (selectedDest) {
+        globeRef.current.pointOfView(
+          { lat: selectedDest.lat, lng: selectedDest.lng, altitude: 1.4 },
+          2200,
+        );
+      }
+    }
+  }, [ceremonyPhase, selectedDest]);
 
-  const htmlData = useMemo<HtmlPoint[]>(
-    () => [
-      ...seedDestinations,
+  // Static arcs (booked/visited) + ceremony arc
+  const arcsData = useMemo<ArcRow[]>(() => {
+    const base = seedDestinations
+      .filter((d) => d.state === 'booked' || d.state === 'visited')
+      .map((d) => ({
+        startLat: ISRAEL_LAT,
+        startLng: ISRAEL_LNG,
+        endLat: d.lat,
+        endLng: d.lng,
+        color: d.state === 'booked' ? STATE_COLORS.booked : STATE_COLORS.visited,
+      }));
+
+    if (showArc(ceremonyPhase) && selectedDest) {
+      base.push({
+        startLat: ISRAEL_LAT,
+        startLng: ISRAEL_LNG,
+        endLat: selectedDest.lat,
+        endLng: selectedDest.lng,
+        color: STATE_COLORS.pin,
+      });
+    }
+
+    return base;
+  }, [ceremonyPhase, selectedDest]);
+
+  // HTML elements: destinations + Israel marker + ceremony pin
+  const htmlData = useMemo<HtmlPoint[]>(() => {
+    const pinVisible = showPin(ceremonyPhase) && selectedDest;
+    const points: HtmlPoint[] = [
+      ...seedDestinations.filter((d) => !(pinVisible && d.id === selectedDest?.id)),
       { id: '__israel__', lat: ISRAEL_LAT, lng: ISRAEL_LNG },
-    ],
-    [],
-  );
+    ];
+    if (pinVisible && selectedDest) {
+      points.push({ id: '__pin__', lat: selectedDest.lat, lng: selectedDest.lng });
+    }
+    return points;
+  }, [ceremonyPhase, selectedDest]);
 
   const getHtmlElement = useCallback((d: object) => {
     const point = d as HtmlPoint;
@@ -73,6 +130,12 @@ export default function GlobeView({ onLottery }: { onLottery: () => void }) {
       ].join(';');
       el.textContent = '✈';
       el.title = 'ישראל — בית';
+      return el;
+    }
+
+    if (point.id === '__pin__') {
+      el.className = 'globe-pin';
+      el.textContent = '📍';
       return el;
     }
 
@@ -135,8 +198,8 @@ export default function GlobeView({ onLottery }: { onLottery: () => void }) {
         arcDashAnimateTime={2500}
       />
 
-      {/* Destination tooltip */}
-      {selected && (
+      {/* Destination tooltip — only in idle */}
+      {selected && ceremonyPhase === 'idle' && (
         <div
           className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-black/80 backdrop-blur-sm text-white rounded-2xl px-5 py-4 shadow-2xl max-w-xs w-full"
           style={{ direction: 'rtl' }}
@@ -162,46 +225,50 @@ export default function GlobeView({ onLottery }: { onLottery: () => void }) {
         </div>
       )}
 
-      {/* לאן טסים? */}
-      <div className="fixed bottom-8 left-0 right-0 flex justify-center z-40 pointer-events-none">
-        <button
-          type="button"
-          className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-xl px-12 py-4 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
-          onClick={(e) => {
-            e.stopPropagation();
-            onLottery();
-          }}
-        >
-          לאן טסים?
-        </button>
-      </div>
-
-      {/* Legend */}
-      <div
-        className="fixed top-4 right-4 z-40 flex flex-col gap-1.5 text-xs text-white/70 bg-black/30 backdrop-blur-sm rounded-xl p-3"
-        style={{ direction: 'rtl' }}
-      >
-        {(
-          [
-            ['dream', 'חלום'],
-            ['starred', 'מועדף'],
-            ['booked', 'הזמנה'],
-            ['visited', 'ביקרנו'],
-          ] as [string, string][]
-        ).map(([state, label]) => (
-          <div key={state} className="flex items-center gap-2">
-            <span
-              className="w-2.5 h-2.5 rounded-full"
-              style={{ background: STATE_COLORS[state] }}
-            />
-            {label}
-          </div>
-        ))}
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full" style={{ background: STATE_COLORS.israel }} />
-          בית ✈
+      {/* לאן טסים? — hidden during ceremony */}
+      {ceremonyPhase === 'idle' && (
+        <div className="fixed bottom-8 left-0 right-0 flex justify-center z-40 pointer-events-none">
+          <button
+            type="button"
+            className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-xl px-12 py-4 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              onLottery();
+            }}
+          >
+            לאן טסים?
+          </button>
         </div>
-      </div>
+      )}
+
+      {/* Legend — only in idle */}
+      {ceremonyPhase === 'idle' && (
+        <div
+          className="fixed top-4 right-4 z-40 flex flex-col gap-1.5 text-xs text-white/70 bg-black/30 backdrop-blur-sm rounded-xl p-3"
+          style={{ direction: 'rtl' }}
+        >
+          {(
+            [
+              ['dream', 'חלום'],
+              ['starred', 'מועדף'],
+              ['booked', 'הזמנה'],
+              ['visited', 'ביקרנו'],
+            ] as [string, string][]
+          ).map(([state, label]) => (
+            <div key={state} className="flex items-center gap-2">
+              <span
+                className="w-2.5 h-2.5 rounded-full"
+                style={{ background: STATE_COLORS[state] }}
+              />
+              {label}
+            </div>
+          ))}
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full" style={{ background: STATE_COLORS.israel }} />
+            בית ✈
+          </div>
+        </div>
+      )}
     </div>
   );
 }

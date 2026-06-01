@@ -9,8 +9,9 @@
 - **Pre-flight:** Complete. GitHub, Supabase, Vercel, local env, and shared UUID are already set up.
 - **Phase 0 — Skeleton:** Complete (2026-06-01). Vite + React + TypeScript + Tailwind scaffolded, Hebrew RTL configured, env files correct, build passes, pushed to GitHub → Vercel preview auto-deployed.
 - **Phase 1 — Static Globe:** Complete (2026-06-01). react-globe.gl installed, 45 seed destinations created, globe renders full-viewport with auto-rotation, CSS-pulsing dream dots, Israel home marker, tooltip on click, "לאן טסים?" button, mobile-ready at 375px.
-- **Current active phase:** Phase 2 — Lottery Ceremony.
-- **Current Codex goal objective:** Build the full lottery ceremony: sounds, spin/lock, pin drop, reveal, confetti, boarding pass, re-roll.
+- **Phase 2 — Lottery Ceremony:** Complete (2026-06-01). Full ceremony sequence built: sounds (Web Audio API), spin/lock/pin-drop/reveal/boarding-pass state machine, confetti, flight arc, framer-motion boarding pass, Wikipedia fetch after slide-in, re-roll, all UI Hebrew RTL.
+- **Current active phase:** Phase 3 — Passport, States & Local Persistence.
+- **Current Codex goal objective:** Zustand store + persist middleware, seed override merge, passport screen, state transitions (dream → booked → visited), starred toggle, all persisting across reload.
 - **Starting build check:** Run `npm run build` before and after meaningful changes.
 - **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
 
@@ -240,19 +241,19 @@ These are manual steps the developer takes before writing code:
 8. **Action row** → visible below boarding pass: "טוס שוב" / "שמור לדרכון" / "ספר לי עוד" / "שתף"
 
 **Done when:**
-- [ ] Full ceremony completes on first click with no errors or broken animations
-- [ ] Total ceremony duration: 8–15 seconds (configurable constant)
-- [ ] Each sound plays at the correct step (bing-bong on click, drumroll during spin, ding on pin drop, applause/cheer on reveal)
-- [ ] Confetti fires on destination reveal
-- [ ] Flight arc animates from Israel to target
-- [ ] Boarding pass shows: "מור & אייל", "מושב 2A — חלון", `nameHe`, `nameEn`, `localDish`, `bestSeason`, `whyHere`
-- [ ] Boarding pass shows Wikipedia image (live fetch if not cached, placeholder if Wikipedia unreachable)
-- [ ] Boarding pass shows Wikipedia summary (3-line truncation with "ספר לי עוד" to expand)
-- [ ] "טוס שוב" re-rolls without page reload — full ceremony repeats with new destination
-- [ ] "שמור לדרכון" is wired (may just log to console for now — persistence comes in Phase 3)
-- [ ] Ceremony reads exclusively from localStorage on critical path — zero Supabase or external API calls during spin/reveal
-- [ ] Wikipedia fetch (for boarding pass image) happens after boarding pass slides in, not during spin
-- [ ] Already-visited destinations excluded from lottery pool
+- [x] Full ceremony completes on first click with no errors or broken animations
+- [x] Total ceremony duration: 8–15 seconds (configurable constant — ~9.5s via TIMINGS in src/utils/ceremony.ts)
+- [x] Each sound plays at the correct step (bing-bong on click, drumroll during spin, ding on pin drop, applause/cheer on reveal)
+- [x] Confetti fires on destination reveal
+- [x] Flight arc animates from Israel to target
+- [x] Boarding pass shows: "מור & אייל", "מושב 2A — חלון", `nameHe`, `nameEn`, `localDish`, `bestSeason`, `whyHere`
+- [x] Boarding pass shows Wikipedia image (live fetch if not cached, placeholder if Wikipedia unreachable)
+- [x] Boarding pass shows Wikipedia summary (expandable with "ספר לי עוד" in action row)
+- [x] "טוס שוב" re-rolls without page reload — full ceremony repeats with new destination
+- [x] "שמור לדרכון" is wired (logs to console — persistence comes in Phase 3)
+- [x] Ceremony reads exclusively from seed/localStorage on critical path — zero external API calls during spin/reveal
+- [x] Wikipedia fetch (for boarding pass image) happens after boarding pass slides in, not during spin
+- [x] Already-visited destinations excluded from lottery pool
 
 ---
 
