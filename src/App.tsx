@@ -5,11 +5,13 @@ import CeremonyOverlay from './components/CeremonyOverlay';
 import BoardingPass from './components/BoardingPass';
 import PassportView from './components/PassportView';
 import DestinationModal, { ModalFormData } from './components/DestinationModal';
+import SyncIndicator from './components/SyncIndicator';
 import { CeremonyPhase, TIMINGS } from './utils/ceremony';
 import { playBingBong, startDrumroll, stopDrumroll, playDing, playApplause } from './utils/sounds';
 import { Destination, DestinationState } from './data/destinations';
 import { usePassportStore, mergeDestinations } from './store/passportStore';
 import { fetchWikiData } from './hooks/wikiData';
+import { useSupabaseSync } from './hooks/useSupabaseSync';
 
 type AppView = 'globe' | 'passport';
 
@@ -24,6 +26,8 @@ export default function App() {
   const userDestinations = usePassportStore(s => s.userDestinations);
   const setDestState = usePassportStore(s => s.setDestState);
   const addDestination = usePassportStore(s => s.addDestination);
+
+  const { syncStatus, manualRefresh } = useSupabaseSync(phase);
 
   const destinations = useMemo(
     () => mergeDestinations(overrides, userDestinations),
@@ -135,6 +139,7 @@ export default function App() {
             />
           )}
         </AnimatePresence>
+        <SyncIndicator status={syncStatus} onRetry={manualRefresh} />
       </>
     );
   }
@@ -174,6 +179,8 @@ export default function App() {
           />
         )}
       </AnimatePresence>
+
+      <SyncIndicator status={syncStatus} onRetry={manualRefresh} />
     </>
   );
 }

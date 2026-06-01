@@ -22,9 +22,16 @@ export type UserOverride = {
   updatedAt: string;
 };
 
+export interface SyncBlob {
+  overrides: Record<string, UserOverride>;
+  userDestinations: Record<string, Destination>;
+  updatedAt: string;
+}
+
 interface PassportStore {
   overrides: Record<string, UserOverride>;
   userDestinations: Record<string, Destination>;
+  storeUpdatedAt: string;
   setDestState: (id: string, state: DestinationState) => void;
   toggleStarred: (id: string) => void;
   setTravelDate: (id: string, date: string) => void;
@@ -33,6 +40,7 @@ interface PassportStore {
   addDestination: (dest: Destination) => void;
   updateDestination: (id: string, fields: Partial<Destination>) => void;
   deleteDestination: (id: string) => void;
+  hydrateFromSupabase: (blob: SyncBlob) => void;
 }
 
 export const usePassportStore = create<PassportStore>()(
@@ -40,12 +48,15 @@ export const usePassportStore = create<PassportStore>()(
     (set, get) => ({
       overrides: {},
       userDestinations: {},
+      storeUpdatedAt: '',
 
       setDestState(id, state) {
+        const now = new Date().toISOString();
         set(s => ({
+          storeUpdatedAt: now,
           overrides: {
             ...s.overrides,
-            [id]: { ...s.overrides[id], state, updatedAt: new Date().toISOString() },
+            [id]: { ...s.overrides[id], state, updatedAt: now },
           },
         }));
       },
@@ -55,54 +66,65 @@ export const usePassportStore = create<PassportStore>()(
         const seedDest = seedDestinations.find(d => d.id === id);
         const userDest = userDestinations[id];
         const cur = overrides[id]?.starred ?? userDest?.starred ?? seedDest?.starred ?? false;
+        const now = new Date().toISOString();
         set(s => ({
+          storeUpdatedAt: now,
           overrides: {
             ...s.overrides,
-            [id]: { ...s.overrides[id], starred: !cur, updatedAt: new Date().toISOString() },
+            [id]: { ...s.overrides[id], starred: !cur, updatedAt: now },
           },
         }));
       },
 
       setTravelDate(id, date) {
+        const now = new Date().toISOString();
         set(s => ({
+          storeUpdatedAt: now,
           overrides: {
             ...s.overrides,
-            [id]: { ...s.overrides[id], travelDate: date, updatedAt: new Date().toISOString() },
+            [id]: { ...s.overrides[id], travelDate: date, updatedAt: now },
           },
         }));
       },
 
       setVisitedDate(id, date) {
+        const now = new Date().toISOString();
         set(s => ({
+          storeUpdatedAt: now,
           overrides: {
             ...s.overrides,
-            [id]: { ...s.overrides[id], visitedDate: date, updatedAt: new Date().toISOString() },
+            [id]: { ...s.overrides[id], visitedDate: date, updatedAt: now },
           },
         }));
       },
 
       setPersonalNote(id, note) {
+        const now = new Date().toISOString();
         set(s => ({
+          storeUpdatedAt: now,
           overrides: {
             ...s.overrides,
-            [id]: { ...s.overrides[id], personalNote: note, updatedAt: new Date().toISOString() },
+            [id]: { ...s.overrides[id], personalNote: note, updatedAt: now },
           },
         }));
       },
 
       addDestination(dest) {
         set(s => ({
+          storeUpdatedAt: dest.updatedAt,
           userDestinations: { ...s.userDestinations, [dest.id]: dest },
         }));
       },
 
       updateDestination(id, fields) {
+        const now = new Date().toISOString();
         const isSeed = seedDestinations.some(d => d.id === id);
         if (isSeed) {
           set(s => ({
+            storeUpdatedAt: now,
             overrides: {
               ...s.overrides,
-              [id]: { ...s.overrides[id], ...fields, updatedAt: new Date().toISOString() },
+              [id]: { ...s.overrides[id], ...fields, updatedAt: now },
             },
           }));
         } else {
@@ -110,9 +132,10 @@ export const usePassportStore = create<PassportStore>()(
             const existing = s.userDestinations[id];
             if (!existing) return s;
             return {
+              storeUpdatedAt: now,
               userDestinations: {
                 ...s.userDestinations,
-                [id]: { ...existing, ...fields, updatedAt: new Date().toISOString() },
+                [id]: { ...existing, ...fields, updatedAt: now },
               },
             };
           });
@@ -120,10 +143,19 @@ export const usePassportStore = create<PassportStore>()(
       },
 
       deleteDestination(id) {
+        const now = new Date().toISOString();
         set(s => {
           const next = { ...s.userDestinations };
           delete next[id];
-          return { userDestinations: next };
+          return { storeUpdatedAt: now, userDestinations: next };
+        });
+      },
+
+      hydrateFromSupabase(blob) {
+        set({
+          overrides: blob.overrides ?? {},
+          userDestinations: blob.userDestinations ?? {},
+          storeUpdatedAt: blob.updatedAt,
         });
       },
     }),

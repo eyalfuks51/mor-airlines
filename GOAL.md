@@ -12,8 +12,9 @@
 - **Phase 2 — Lottery Ceremony:** Complete (2026-06-01). Full ceremony sequence built: sounds (Web Audio API), spin/lock/pin-drop/reveal/boarding-pass state machine, confetti, flight arc, framer-motion boarding pass, Wikipedia fetch after slide-in, re-roll, all UI Hebrew RTL.
 - **Phase 3 — Passport, States & Local Persistence:** Complete (2026-06-01). Zustand store with persist, seed override merge, passport screen (היינו/מסלול/חלומות/דקור), state transitions, starred toggle, editable dates/notes, globe reflects state, all persisting across reload.
 - **Phase 4 — CRUD + External Data:** Complete (2026-06-01). Add/edit/delete destinations, Open-Meteo geocoding, Wikipedia caching, vibe tag chips, seed override isolation.
-- **Current active phase:** Phase 5 — Supabase Sync.
-- **Current Codex goal objective:** Background Supabase sync between devices.
+- **Phase 5 — Supabase Sync:** Complete (2026-06-01). Background Supabase sync, offline indicator, keep-alive workflow.
+- **Current active phase:** Phase 6 — Filters, Polish & PWA.
+- **Current Codex goal objective:** Vibe filters, PWA installability, and final production polish.
 - **Starting build check:** Run `npm run build` before and after meaningful changes.
 - **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
 
@@ -302,20 +303,21 @@ These are manual steps the developer takes before writing code:
 ## Phase 5 — Supabase Sync
 
 **Build:** Shared passport between two phones via Supabase blob sync
+**Complete:** 2026-06-01
 
 **Done when:**
-- [ ] Supabase JS client initialized using env vars (no hardcoded values)
-- [ ] On app load: localStorage renders immediately, then background fetch from Supabase runs within 3 seconds
-- [ ] If Supabase blob `updated_at` > localStorage `updated_at` → merge into localStorage, UI updates silently
-- [ ] On edit: writes to localStorage immediately, then debounced 2s push of full User layer blob to Supabase
-- [ ] Edit on Device A → visible on Device B within 10 seconds on next page load or manual refresh
-- [ ] First load on brand-new device (empty localStorage): app loads data from Supabase
-- [ ] Ceremony runs at full speed while sync is in-flight (non-blocking)
-- [ ] If Supabase is unreachable: app works fully from localStorage, soft offline indicator shown
-- [ ] No keys or UUIDs hardcoded in source code
-- [ ] `VITE_PASSPORT_UUID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` all sourced from env
-- [ ] GitHub Action keep-alive created at `.github/workflows/supabase-keepalive.yml` — pings Supabase once per week (Monday 9am) to prevent free tier pause
-- [ ] Keep-alive Action visible and green in GitHub Actions tab
+- [x] Supabase JS client initialized using env vars (no hardcoded values) — `src/lib/supabase.ts`
+- [x] On app load: localStorage renders immediately, then background fetch from Supabase runs within 3 seconds — `useSupabaseSync` delays 1s before first fetch
+- [x] If Supabase blob `updated_at` > localStorage `updated_at` → merge into localStorage, UI updates silently — `hydrateFromSupabase` action + `storeUpdatedAt` comparison
+- [x] On edit: writes to localStorage immediately, then debounced 2s push of full User layer blob to Supabase — `PUSH_DEBOUNCE_MS = 2000`
+- [x] Edit on Device A → visible on Device B within 10 seconds on next page load or manual refresh — sync on mount + manual refresh button
+- [x] First load on brand-new device (empty localStorage): app loads data from Supabase — empty `storeUpdatedAt` triggers hydration
+- [x] Ceremony runs at full speed while sync is in-flight (non-blocking) — `ceremonyActiveRef` blocks hydration during spin/reveal; push debounce skips while ceremony active
+- [x] If Supabase is unreachable: app works fully from localStorage, soft offline indicator shown — `SyncIndicator` component shows Hebrew "אין חיבור לענן" + retry
+- [x] No keys or UUIDs hardcoded in source code — grep verified
+- [x] `VITE_PASSPORT_UUID`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` all sourced from env
+- [x] GitHub Action keep-alive created at `.github/workflows/supabase-keepalive.yml` — pings Supabase once per week (Monday 9am) to prevent free tier pause
+- [ ] Keep-alive Action visible and green in GitHub Actions tab — requires VITE_SUPABASE_URL + VITE_SUPABASE_ANON_KEY set as GitHub Actions secrets
 
 ---
 
