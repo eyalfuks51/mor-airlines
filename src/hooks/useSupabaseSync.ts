@@ -27,9 +27,11 @@ export function useSupabaseSync(ceremonyPhase: CeremonyPhase) {
   const pushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastPushedAtRef = useRef('');
   const isInitialMountRef = useRef(true);
+  const initialFetchDoneRef = useRef(false);
 
   const fetchFromSupabase = useCallback(async () => {
     if (!PASSPORT_ID || !import.meta.env.VITE_SUPABASE_URL) return;
+    if (ceremonyActiveRef.current) return;
     setSyncStatus('syncing');
     try {
       const { data, error } = await supabase
@@ -49,6 +51,7 @@ export function useSupabaseSync(ceremonyPhase: CeremonyPhase) {
           hydrateFromSupabase(remote);
         }
       }
+      initialFetchDoneRef.current = true;
       setSyncStatus('synced');
     } catch {
       setSyncStatus('offline');
@@ -61,6 +64,13 @@ export function useSupabaseSync(ceremonyPhase: CeremonyPhase) {
     return () => clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Retry initial fetch when ceremony ends if it was skipped due to early-start tap
+  useEffect(() => {
+    if (!initialFetchDoneRef.current && (ceremonyPhase === 'idle' || ceremonyPhase === 'boarding-pass')) {
+      fetchFromSupabase();
+    }
+  }, [ceremonyPhase, fetchFromSupabase]);
 
   // Debounced push on every store change (skip first render)
   useEffect(() => {

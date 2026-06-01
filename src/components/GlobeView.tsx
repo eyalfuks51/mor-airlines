@@ -195,15 +195,15 @@ export default function GlobeView({
   return (
     <div
       className="relative overflow-hidden"
-      style={{ width: '100vw', height: '100vh', background: '#060614' }}
+      style={{ width: '100vw', height: '100vh', background: 'var(--night)' }}
       onClick={() => setSelectedId(null)}
     >
       <Globe
         ref={globeRef}
         width={dims.w}
         height={dims.h}
-        globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-        backgroundImageUrl="https://unpkg.com/three-globe/example/img/night-sky.png"
+        globeImageUrl="/globe/earth-blue-marble.jpg"
+        backgroundImageUrl="/globe/night-sky.png"
         onGlobeReady={handleGlobeReady}
         htmlElementsData={htmlData}
         htmlLat="lat"
@@ -226,19 +226,19 @@ export default function GlobeView({
       {/* Destination tooltip — only in idle */}
       {selected && ceremonyPhase === 'idle' && (
         <div
-          className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-black/80 backdrop-blur-sm text-white rounded-2xl px-5 py-4 shadow-2xl max-w-xs w-full"
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-50 passport-card px-5 py-4 max-w-xs w-full"
           style={{ direction: 'rtl' }}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="font-bold text-lg leading-tight">{selected.nameHe}</p>
-              <p className="text-white/50 text-sm">{selected.nameEn}</p>
+              <p className="font-airline text-lg leading-tight text-[color:var(--ink)]">{selected.nameHe}</p>
+              <p className="font-stamp text-[color:var(--stamp-blue)] text-sm">{selected.nameEn}</p>
               {selected.tagline && (
-                <p className="text-white/60 text-xs mt-1">{selected.tagline}</p>
+                <p className="text-[color:var(--ink-muted)] text-xs mt-1">{selected.tagline}</p>
               )}
               {selected.state !== 'dream' && (
-                <p className="text-xs mt-1.5 font-medium"
+                <p className="font-stamp text-xs mt-1.5"
                   style={{ color: STATE_COLORS[selected.state] }}
                 >
                   {selected.state === 'booked' ? '✈ הזמנה' : '✓ ביקרנו'}
@@ -273,7 +273,7 @@ export default function GlobeView({
         <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-40 pointer-events-none px-4">
           {lotteryPoolEmpty && (
             <p
-              className="pointer-events-none text-white/60 text-sm font-medium bg-black/40 backdrop-blur-sm rounded-xl px-4 py-2"
+              className="pointer-events-none text-[color:var(--paper)] text-sm font-bold bg-black/45 rounded-xl px-4 py-2"
               style={{ direction: 'rtl' }}
             >
               אין יעדים שמתאימים לסינון
@@ -282,7 +282,7 @@ export default function GlobeView({
           <div className="flex justify-center items-center gap-2 w-full">
             <button
               type="button"
-              className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
+              className="pointer-events-auto ticket-action-secondary text-sm font-bold px-3 whitespace-nowrap"
               onClick={(e) => {
                 e.stopPropagation();
                 onAddDestination();
@@ -294,10 +294,10 @@ export default function GlobeView({
               type="button"
               disabled={lotteryPoolEmpty}
               className={[
-                'pointer-events-auto font-bold text-lg px-8 py-3.5 rounded-2xl transition-all',
+                'pointer-events-auto font-airline text-lg px-8 py-3.5 rounded-xl transition-all',
                 lotteryPoolEmpty
-                  ? 'bg-indigo-900/50 text-white/30 cursor-not-allowed'
-                  : 'bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white shadow-lg shadow-indigo-500/30 cursor-pointer',
+                  ? 'bg-slate-900/70 text-white/30 cursor-not-allowed'
+                  : 'bg-[color:var(--gold)] hover:bg-amber-300 active:scale-95 text-[color:var(--ink)] shadow-lg cursor-pointer',
               ].join(' ')}
               onClick={(e) => {
                 e.stopPropagation();
@@ -308,7 +308,7 @@ export default function GlobeView({
             </button>
             <button
               type="button"
-              className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
+              className="pointer-events-auto ticket-action-secondary text-sm font-bold px-3 whitespace-nowrap"
               onClick={(e) => {
                 e.stopPropagation();
                 onOpenPassport();
@@ -323,7 +323,7 @@ export default function GlobeView({
       {/* Legend — only in idle */}
       {ceremonyPhase === 'idle' && (
         <div
-          className="fixed top-4 right-4 z-40 flex flex-col gap-1.5 text-xs text-white/70 bg-black/30 backdrop-blur-sm rounded-xl p-3"
+          className="fixed top-4 right-4 z-40 flex flex-col gap-1.5 font-stamp text-xs text-white/75 bg-black/35 rounded-xl p-3"
           style={{ direction: 'rtl' }}
         >
           {(

@@ -29,6 +29,7 @@ export default function App() {
   const overrides = usePassportStore(s => s.overrides);
   const userDestinations = usePassportStore(s => s.userDestinations);
   const setDestState = usePassportStore(s => s.setDestState);
+  const toggleStarred = usePassportStore(s => s.toggleStarred);
   const addDestination = usePassportStore(s => s.addDestination);
 
   const { syncStatus, manualRefresh } = useSupabaseSync(phase);
@@ -71,12 +72,15 @@ export default function App() {
     [filteredDestinations],
   );
 
-  const runCeremony = useCallback(() => {
-    if (lotteryPool.length === 0) return;
+  const runCeremony = useCallback((excludeId?: string) => {
+    const pool = excludeId ? lotteryPool.filter(d => d.id !== excludeId) : lotteryPool;
+    if (pool.length === 0 && lotteryPool.length === 0) return;
+    if (pool.length === 0 && lotteryPool.length <= 1) return;
     clearTimers();
     stopDrumroll();
 
-    const chosen = lotteryPool[Math.floor(Math.random() * lotteryPool.length)];
+    const activePool = pool.length > 0 ? pool : lotteryPool;
+    const chosen = activePool[Math.floor(Math.random() * activePool.length)];
     setDest(chosen);
     setPhase('spin');
     playBingBong();
@@ -108,8 +112,8 @@ export default function App() {
   const handleReroll = useCallback(() => {
     clearTimers();
     stopDrumroll();
-    runCeremony();
-  }, [runCeremony, clearTimers]);
+    runCeremony(dest?.id);
+  }, [runCeremony, clearTimers, dest]);
 
   const handleSave = useCallback((state: DestinationState) => {
     if (dest) {
@@ -117,6 +121,13 @@ export default function App() {
       setDest(prev => (prev ? { ...prev, state } : prev));
     }
   }, [dest, setDestState]);
+
+  const handleToggleStar = useCallback(() => {
+    if (dest) {
+      toggleStarred(dest.id);
+      setDest(prev => (prev ? { ...prev, starred: !prev.starred } : prev));
+    }
+  }, [dest, toggleStarred]);
 
   const handleShare = useCallback(() => {
     if (!dest) return;
@@ -203,6 +214,7 @@ export default function App() {
             onReroll={handleReroll}
             onSave={handleSave}
             onShare={handleShare}
+            onToggleStar={handleToggleStar}
           />
         )}
       </AnimatePresence>
