@@ -66,18 +66,17 @@ export default function App() {
     timersRef.current = [];
   }, []);
 
+  const lotteryPool = useMemo(
+    () => filteredDestinations.filter(d => d.state !== 'visited'),
+    [filteredDestinations],
+  );
+
   const runCeremony = useCallback(() => {
+    if (lotteryPool.length === 0) return;
     clearTimers();
     stopDrumroll();
 
-    // Lottery pool respects active filters; exclude visited
-    const pool = filteredDestinations.filter(d => d.state !== 'visited');
-    // Fallback to all non-visited if filter yields empty pool
-    const drawFrom = pool.length > 0
-      ? pool
-      : destinations.filter(d => d.state !== 'visited');
-
-    const chosen = drawFrom[Math.floor(Math.random() * drawFrom.length)];
+    const chosen = lotteryPool[Math.floor(Math.random() * lotteryPool.length)];
     setDest(chosen);
     setPhase('spin');
     playBingBong();
@@ -104,7 +103,7 @@ export default function App() {
     }, TIMINGS.SPIN_MS + TIMINGS.LOCK_MS + TIMINGS.PIN_MS + TIMINGS.REVEAL_MS);
 
     timersRef.current = [t1, t2, t3, t4, t5];
-  }, [filteredDestinations, destinations, clearTimers]);
+  }, [lotteryPool, clearTimers]);
 
   const handleReroll = useCallback(() => {
     clearTimers();
@@ -191,6 +190,7 @@ export default function App() {
         onVibeToggle={handleVibeToggle}
         onStateChange={handleStateChange}
         onResetFilters={handleResetFilters}
+        lotteryPoolEmpty={lotteryPool.length === 0}
       />
 
       <CeremonyOverlay phase={phase} dest={dest} />

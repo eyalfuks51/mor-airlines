@@ -41,6 +41,7 @@ interface Props {
   onVibeToggle: (vibe: VibeTag) => void;
   onStateChange: (state: DestinationState | 'all') => void;
   onResetFilters: () => void;
+  lotteryPoolEmpty: boolean;
 }
 
 const showPin = (phase: CeremonyPhase) =>
@@ -61,6 +62,7 @@ export default function GlobeView({
   onVibeToggle,
   onStateChange,
   onResetFilters,
+  lotteryPoolEmpty,
 }: Props) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
@@ -268,37 +270,53 @@ export default function GlobeView({
 
       {/* Bottom bar — hidden during ceremony */}
       {ceremonyPhase === 'idle' && (
-        <div className="fixed bottom-4 left-0 right-0 flex justify-center items-center gap-2 z-40 pointer-events-none px-4">
-          <button
-            type="button"
-            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddDestination();
-            }}
-          >
-            + הוסף
-          </button>
-          <button
-            type="button"
-            className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-lg px-8 py-3.5 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              onLottery();
-            }}
-          >
-            לאן טסים?
-          </button>
-          <button
-            type="button"
-            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
-            onClick={(e) => {
-              e.stopPropagation();
-              onOpenPassport();
-            }}
-          >
-            📔 דרכון
-          </button>
+        <div className="fixed bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-40 pointer-events-none px-4">
+          {lotteryPoolEmpty && (
+            <p
+              className="pointer-events-none text-white/60 text-sm font-medium bg-black/40 backdrop-blur-sm rounded-xl px-4 py-2"
+              style={{ direction: 'rtl' }}
+            >
+              אין יעדים שמתאימים לסינון
+            </p>
+          )}
+          <div className="flex justify-center items-center gap-2 w-full">
+            <button
+              type="button"
+              className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddDestination();
+              }}
+            >
+              + הוסף
+            </button>
+            <button
+              type="button"
+              disabled={lotteryPoolEmpty}
+              className={[
+                'pointer-events-auto font-bold text-lg px-8 py-3.5 rounded-2xl transition-all',
+                lotteryPoolEmpty
+                  ? 'bg-indigo-900/50 text-white/30 cursor-not-allowed'
+                  : 'bg-indigo-600 hover:bg-indigo-500 active:scale-95 text-white shadow-lg shadow-indigo-500/30 cursor-pointer',
+              ].join(' ')}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (!lotteryPoolEmpty) onLottery();
+              }}
+            >
+              לאן טסים?
+            </button>
+            <button
+              type="button"
+              className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-3 py-3 rounded-2xl backdrop-blur-sm border border-white/10 whitespace-nowrap"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenPassport();
+              }}
+            >
+              📔 דרכון
+            </button>
+          </div>
         </div>
       )}
 
