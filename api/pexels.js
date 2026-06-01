@@ -1,8 +1,19 @@
 export const config = { runtime: 'edge' };
 
+const ALLOWED_ORIGINS = [
+  'https://mor-airlines.vercel.app',
+  'http://localhost',
+];
+
 export default async function handler(req) {
+  const referer = req.headers.get('referer') ?? '';
+  if (referer && !ALLOWED_ORIGINS.some((o) => referer.startsWith(o))) {
+    return new Response('Forbidden', { status: 403 });
+  }
+
   const { searchParams } = new URL(req.url);
-  const query = searchParams.get('query') ?? '';
+  const raw = searchParams.get('query') ?? '';
+  const query = raw.slice(0, 100).trim();
   if (!query) return Response.json({ url: null });
 
   const key = process.env.PEXELS_API_KEY;
