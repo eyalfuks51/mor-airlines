@@ -1,32 +1,37 @@
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useMemo } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import GlobeView from './components/GlobeView';
 import CeremonyOverlay from './components/CeremonyOverlay';
 import BoardingPass from './components/BoardingPass';
+import PassportView from './components/PassportView';
 import { CeremonyPhase, TIMINGS } from './utils/ceremony';
 import { playBingBong, startDrumroll, stopDrumroll, playDing, playApplause } from './utils/sounds';
-import { seedDestinations, Destination } from './data/destinations';
+import { Destination, DestinationState } from './data/destinations';
+import { usePassportStore, mergeDestinations } from './store/passportStore';
 
-function pickDest(): Destination {
-  const pool = seedDestinations.filter((d) => d.state !== 'visited');
-  return pool[Math.floor(Math.random() * pool.length)];
-}
+type AppView = 'globe' | 'passport';
 
 export default function App() {
+  const [view, setView] = useState<AppView>('globe');
   const [phase, setPhase] = useState<CeremonyPhase>('idle');
   const [dest, setDest] = useState<Destination | null>(null);
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  const clearTimers = () => {
+  const overrides = usePassportStore(s => s.overrides);
+  const setDestState = usePassportStore(s => s.setDestState);
+  const destinations = useMemo(() => mergeDestinations(overrides), [overrides]);
+
+  const clearTimers = useCallback(() => {
     timersRef.current.forEach(clearTimeout);
     timersRef.current = [];
-  };
+  }, []);
 
   const runCeremony = useCallback(() => {
     clearTimers();
     stopDrumroll();
 
-    const chosen = pickDest();
+    const pool = destinations.filter(d => d.state !== 'visited');
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
     setDest(chosen);
     setPhase('spin');
     playBingBong();
@@ -53,17 +58,20 @@ export default function App() {
     }, TIMINGS.SPIN_MS + TIMINGS.LOCK_MS + TIMINGS.PIN_MS + TIMINGS.REVEAL_MS);
 
     timersRef.current = [t1, t2, t3, t4, t5];
-  }, []);
+  }, [destinations, clearTimers]);
 
   const handleReroll = useCallback(() => {
     clearTimers();
     stopDrumroll();
-    runCeremony(); // phase jumps to 'spin'; AnimatePresence exits boarding pass
-  }, [runCeremony]);
+    runCeremony();
+  }, [runCeremony, clearTimers]);
 
-  const handleSave = useCallback(() => {
-    if (dest) console.log('שמור לדרכון (Phase 3):', dest.nameEn);
-  }, [dest]);
+  const handleSave = useCallback((state: DestinationState) => {
+    if (dest) {
+      setDestState(dest.id, state);
+      setDest(prev => (prev ? { ...prev, state } : prev));
+    }
+  }, [dest, setDestState]);
 
   const handleShare = useCallback(() => {
     if (!dest) return;
@@ -77,10 +85,21 @@ export default function App() {
     }
   }, [dest]);
 
+  if (view === 'passport') {
+    return (
+      <PassportView
+        destinations={destinations}
+        onBack={() => setView('globe')}
+      />
+    );
+  }
+
   return (
     <>
       <GlobeView
+        destinations={destinations}
         onLottery={runCeremony}
+        onOpenPassport={() => setView('passport')}
         ceremonyPhase={phase}
         selectedDest={dest}
       />

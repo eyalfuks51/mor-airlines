@@ -10,8 +10,9 @@
 - **Phase 0 — Skeleton:** Complete (2026-06-01). Vite + React + TypeScript + Tailwind scaffolded, Hebrew RTL configured, env files correct, build passes, pushed to GitHub → Vercel preview auto-deployed.
 - **Phase 1 — Static Globe:** Complete (2026-06-01). react-globe.gl installed, 45 seed destinations created, globe renders full-viewport with auto-rotation, CSS-pulsing dream dots, Israel home marker, tooltip on click, "לאן טסים?" button, mobile-ready at 375px.
 - **Phase 2 — Lottery Ceremony:** Complete (2026-06-01). Full ceremony sequence built: sounds (Web Audio API), spin/lock/pin-drop/reveal/boarding-pass state machine, confetti, flight arc, framer-motion boarding pass, Wikipedia fetch after slide-in, re-roll, all UI Hebrew RTL.
-- **Current active phase:** Phase 3 — Passport, States & Local Persistence.
-- **Current Codex goal objective:** Zustand store + persist middleware, seed override merge, passport screen, state transitions (dream → booked → visited), starred toggle, all persisting across reload.
+- **Phase 3 — Passport, States & Local Persistence:** Complete (2026-06-01). Zustand store with persist, seed override merge, passport screen (היינו/מסלול/חלומות/דקור), state transitions, starred toggle, editable dates/notes, globe reflects state, all persisting across reload.
+- **Current active phase:** Phase 4 — CRUD + External Data.
+- **Current Codex goal objective:** Add/edit/delete destinations, geocoding, Wikipedia caching, vibe tags.
 - **Starting build check:** Run `npm run build` before and after meaningful changes.
 - **Production deploy:** Out of scope until Phase 6 and still requires explicit user instruction before `vercel --prod`.
 
@@ -262,19 +263,19 @@ These are manual steps the developer takes before writing code:
 **Build:** Full Zustand state management, passport screen, localStorage persistence
 
 **Done when:**
-- [ ] Zustand store with `persist` middleware writes to localStorage
-- [ ] Seed + override merge logic implemented and verified (edit seed destination → stored as override, seed file unchanged, merged result shown in UI)
-- [ ] All state transitions work from boarding pass and from destination detail: dream → booked, dream → visited, booked → visited
-- [ ] Starred toggle works (star/unstar from any view)
-- [ ] All state changes persist across full page reload (close tab, reopen — state preserved)
-- [ ] Passport screen accessible via navigation (globe ↔ passport)
-- [ ] Passport screen shows destinations grouped by state: היינו (visited with stamps) / מסלול (booked) / חלומות (dream) / דקור (starred)
-- [ ] Each destination card in passport shows visual "stamp" matching its state
-- [ ] Travel date field on booked destination detail (editable)
-- [ ] Visited date field on visited destination detail (editable)
-- [ ] Personal note field on visited destination (editable, persists)
-- [ ] Globe reflects current state of all destinations (arcs appear when booked/visited)
-- [ ] "שמור לדרכון" button on boarding pass correctly transitions destination state
+- [x] Zustand store with `persist` middleware writes to localStorage
+- [x] Seed + override merge logic implemented and verified (edit seed destination → stored as override, seed file unchanged, merged result shown in UI)
+- [x] All state transitions work from boarding pass and from destination detail: dream → booked, dream → visited, booked → visited
+- [x] Starred toggle works (star/unstar from any view)
+- [x] All state changes persist across full page reload (close tab, reopen — state preserved)
+- [x] Passport screen accessible via navigation (globe ↔ passport)
+- [x] Passport screen shows destinations grouped by state: היינו (visited with stamps) / מסלול (booked) / חלומות (dream) / דקור (starred)
+- [x] Each destination card in passport shows visual "stamp" matching its state
+- [x] Travel date field on booked destination detail (editable)
+- [x] Visited date field on visited destination detail (editable)
+- [x] Personal note field on visited destination (editable, persists)
+- [x] Globe reflects current state of all destinations (arcs appear when booked/visited)
+- [x] "שמור לדרכון" button on boarding pass correctly transitions destination state
 
 ---
 

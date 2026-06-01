@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useMemo, useCallback } from 'react';
 import Globe, { GlobeMethods } from 'react-globe.gl';
-import { seedDestinations, Destination } from '../data/destinations';
+import { Destination } from '../data/destinations';
 import { CeremonyPhase } from '../utils/ceremony';
 
 const ISRAEL_LAT = 31.7683;
@@ -29,7 +29,9 @@ type HtmlPoint =
   | { id: '__pin__'; lat: number; lng: number };
 
 interface Props {
+  destinations: Destination[];
   onLottery: () => void;
+  onOpenPassport: () => void;
   ceremonyPhase: CeremonyPhase;
   selectedDest: Destination | null;
 }
@@ -40,12 +42,17 @@ const showPin = (phase: CeremonyPhase) =>
 const showArc = (phase: CeremonyPhase) =>
   phase === 'reveal' || phase === 'boarding-pass';
 
-export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Props) {
+export default function GlobeView({ destinations, onLottery, onOpenPassport, ceremonyPhase, selectedDest }: Props) {
   const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [dims, setDims] = useState({ w: window.innerWidth, h: window.innerHeight });
-  const [selected, setSelected] = useState<Destination | null>(null);
-  const setSelectedRef = useRef(setSelected);
-  setSelectedRef.current = setSelected;
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const setSelectedIdRef = useRef(setSelectedId);
+  setSelectedIdRef.current = setSelectedId;
+
+  const selected = useMemo(
+    () => destinations.find(d => d.id === selectedId) ?? null,
+    [destinations, selectedId],
+  );
 
   useEffect(() => {
     const onResize = () => setDims({ w: window.innerWidth, h: window.innerHeight });
@@ -53,7 +60,6 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
-  // Globe rotation speed control
   useEffect(() => {
     if (!globeRef.current) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,11 +83,10 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
     }
   }, [ceremonyPhase, selectedDest]);
 
-  // Static arcs (booked/visited) + ceremony arc
   const arcsData = useMemo<ArcRow[]>(() => {
-    const base = seedDestinations
-      .filter((d) => d.state === 'booked' || d.state === 'visited')
-      .map((d) => ({
+    const base = destinations
+      .filter(d => d.state === 'booked' || d.state === 'visited')
+      .map(d => ({
         startLat: ISRAEL_LAT,
         startLng: ISRAEL_LNG,
         endLat: d.lat,
@@ -100,20 +105,19 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
     }
 
     return base;
-  }, [ceremonyPhase, selectedDest]);
+  }, [destinations, ceremonyPhase, selectedDest]);
 
-  // HTML elements: destinations + Israel marker + ceremony pin
   const htmlData = useMemo<HtmlPoint[]>(() => {
     const pinVisible = showPin(ceremonyPhase) && selectedDest;
     const points: HtmlPoint[] = [
-      ...seedDestinations.filter((d) => !(pinVisible && d.id === selectedDest?.id)),
+      ...destinations.filter(d => !(pinVisible && d.id === selectedDest?.id)),
       { id: '__israel__', lat: ISRAEL_LAT, lng: ISRAEL_LNG },
     ];
     if (pinVisible && selectedDest) {
       points.push({ id: '__pin__', lat: selectedDest.lat, lng: selectedDest.lng });
     }
     return points;
-  }, [ceremonyPhase, selectedDest]);
+  }, [destinations, ceremonyPhase, selectedDest]);
 
   const getHtmlElement = useCallback((d: object) => {
     const point = d as HtmlPoint;
@@ -149,7 +153,7 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
 
     el.addEventListener('click', (e) => {
       e.stopPropagation();
-      setSelectedRef.current((prev) => (prev?.id === dest.id ? null : dest));
+      setSelectedIdRef.current(prev => (prev === dest.id ? null : dest.id));
     });
 
     return el;
@@ -171,7 +175,7 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
     <div
       className="relative overflow-hidden"
       style={{ width: '100vw', height: '100vh', background: '#060614' }}
-      onClick={() => setSelected(null)}
+      onClick={() => setSelectedId(null)}
     >
       <Globe
         ref={globeRef}
@@ -212,6 +216,13 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
               {selected.tagline && (
                 <p className="text-white/60 text-xs mt-1">{selected.tagline}</p>
               )}
+              {selected.state !== 'dream' && (
+                <p className="text-xs mt-1.5 font-medium"
+                  style={{ color: STATE_COLORS[selected.state] }}
+                >
+                  {selected.state === 'booked' ? '✈ הזמנה' : '✓ ביקרנו'}
+                </p>
+              )}
             </div>
             <span
               className="w-3 h-3 rounded-full flex-shrink-0 mt-1"
@@ -225,9 +236,19 @@ export default function GlobeView({ onLottery, ceremonyPhase, selectedDest }: Pr
         </div>
       )}
 
-      {/* לאן טסים? — hidden during ceremony */}
+      {/* Bottom bar — hidden during ceremony */}
       {ceremonyPhase === 'idle' && (
-        <div className="fixed bottom-8 left-0 right-0 flex justify-center z-40 pointer-events-none">
+        <div className="fixed bottom-8 left-0 right-0 flex justify-center items-center gap-3 z-40 pointer-events-none px-6">
+          <button
+            type="button"
+            className="pointer-events-auto bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white text-sm font-bold px-5 py-3.5 rounded-2xl backdrop-blur-sm border border-white/10"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenPassport();
+            }}
+          >
+            📔 הדרכון שלנו
+          </button>
           <button
             type="button"
             className="pointer-events-auto bg-indigo-600 hover:bg-indigo-500 active:scale-95 transition-all text-white font-bold text-xl px-12 py-4 rounded-2xl shadow-lg shadow-indigo-500/30 cursor-pointer"
