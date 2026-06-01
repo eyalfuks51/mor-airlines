@@ -3,6 +3,7 @@ import Globe, { GlobeMethods } from 'react-globe.gl';
 import { Destination, VibeTag, DestinationState } from '../data/destinations';
 import { CeremonyPhase } from '../utils/ceremony';
 import FilterBar from './FilterBar';
+import { AnimatedText } from './ui/animated-text';
 
 const ISRAEL_LAT = 31.7683;
 const ISRAEL_LNG = 35.2137;
@@ -222,6 +223,21 @@ export default function GlobeView({
         arcDashGap={0.5}
         arcDashAnimateTime={2500}
       />
+
+      {/* Title — only in idle */}
+      {ceremonyPhase === 'idle' && (
+        <div className="fixed top-6 left-0 right-0 flex justify-center z-40 pointer-events-none">
+          <AnimatedText
+            text="מותק לאן טסים היום?"
+            duration={0.05}
+            delay={0.08}
+            textClassName="font-airline text-2xl text-white drop-shadow-lg"
+            underlineGradient="from-amber-400 via-yellow-300 to-amber-400"
+            underlineHeight="h-0.5"
+            underlineOffset="-bottom-1"
+          />
+        </div>
+      )}
 
       {/* Destination tooltip — only in idle */}
       {selected && ceremonyPhase === 'idle' && (
