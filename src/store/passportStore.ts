@@ -41,6 +41,7 @@ interface PassportStore {
   updateDestination: (id: string, fields: Partial<Destination>) => void;
   deleteDestination: (id: string) => void;
   hydrateFromSupabase: (blob: SyncBlob) => void;
+  mergeFromSupabase: (blob: SyncBlob) => void;
 }
 
 export const usePassportStore = create<PassportStore>()(
@@ -157,6 +158,33 @@ export const usePassportStore = create<PassportStore>()(
           userDestinations: blob.userDestinations ?? {},
           storeUpdatedAt: blob.updatedAt,
         });
+      },
+
+      mergeFromSupabase(blob) {
+        const { overrides: localOv, userDestinations: localUD } = get();
+        let changed = false;
+
+        const mergedOverrides = { ...localOv };
+        for (const [id, remoteOv] of Object.entries(blob.overrides ?? {})) {
+          const local = localOv[id];
+          if (!local || remoteOv.updatedAt > local.updatedAt) {
+            mergedOverrides[id] = remoteOv;
+            changed = true;
+          }
+        }
+
+        const mergedUD = { ...localUD };
+        for (const [id, remoteDest] of Object.entries(blob.userDestinations ?? {})) {
+          const local = localUD[id];
+          if (!local || remoteDest.updatedAt > local.updatedAt) {
+            mergedUD[id] = remoteDest;
+            changed = true;
+          }
+        }
+
+        if (!changed) return;
+        const now = new Date().toISOString();
+        set({ overrides: mergedOverrides, userDestinations: mergedUD, storeUpdatedAt: now });
       },
     }),
     { name: 'mor-airlines-passport' },

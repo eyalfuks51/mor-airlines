@@ -15,6 +15,7 @@ export function useSupabaseSync(ceremonyPhase: CeremonyPhase) {
   const userDestinations = usePassportStore(s => s.userDestinations);
   const storeUpdatedAt = usePassportStore(s => s.storeUpdatedAt);
   const hydrateFromSupabase = usePassportStore(s => s.hydrateFromSupabase);
+  const mergeFromSupabase = usePassportStore(s => s.mergeFromSupabase);
 
   const storeUpdatedAtRef = useRef(storeUpdatedAt);
   useEffect(() => { storeUpdatedAtRef.current = storeUpdatedAt; }, [storeUpdatedAt]);
@@ -47,8 +48,12 @@ export function useSupabaseSync(ceremonyPhase: CeremonyPhase) {
         const remoteAt = remote.updatedAt ?? data.updated_at ?? '';
         const localAt = storeUpdatedAtRef.current;
 
-        if (!ceremonyActiveRef.current && (!localAt || remoteAt > localAt)) {
-          hydrateFromSupabase(remote);
+        if (!ceremonyActiveRef.current) {
+          if (!localAt || remoteAt > localAt) {
+            hydrateFromSupabase(remote);
+          } else {
+            mergeFromSupabase(remote);
+          }
         }
       }
       initialFetchDoneRef.current = true;
@@ -56,7 +61,7 @@ export function useSupabaseSync(ceremonyPhase: CeremonyPhase) {
     } catch {
       setSyncStatus('offline');
     }
-  }, [hydrateFromSupabase]);
+  }, [hydrateFromSupabase, mergeFromSupabase]);
 
   // Initial background fetch after mount
   useEffect(() => {
