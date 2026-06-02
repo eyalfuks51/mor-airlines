@@ -95,7 +95,7 @@ const AnimatedText = React.forwardRef<HTMLDivElement, AnimatedTextProps>(
             variants={container}
             initial="hidden"
             animate={replay ? "visible" : "hidden"}
-            className={cn("text-4xl font-bold text-center", textClassName)}
+            className={cn("text-center", textClassName ?? "text-4xl font-bold")}
           >
             {letters.map((letter, index) => (
               <motion.span key={index} variants={child}>

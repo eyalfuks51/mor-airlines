@@ -226,12 +226,13 @@ export default function GlobeView({
 
       {/* Title — only in idle */}
       {ceremonyPhase === 'idle' && (
-        <div className="fixed top-6 left-0 right-0 flex justify-center z-40 pointer-events-none">
+        <div className="fixed top-3 sm:top-6 left-0 right-0 flex justify-center z-40 pointer-events-none px-4">
           <AnimatedText
             text="מותק לאן טסים היום?"
             duration={0.05}
             delay={0.08}
-            textClassName="font-airline text-2xl text-white drop-shadow-lg"
+            className="max-w-[calc(100vw-2rem)]"
+            textClassName="font-airline text-[clamp(1.25rem,6vw,1.65rem)] sm:text-2xl text-white drop-shadow-lg"
             underlineGradient="from-amber-400 via-yellow-300 to-amber-400"
             underlineHeight="h-0.5"
             underlineOffset="-bottom-1"
@@ -339,7 +340,7 @@ export default function GlobeView({
       {/* Legend — only in idle */}
       {ceremonyPhase === 'idle' && (
         <div
-          className="fixed top-4 right-4 z-40 flex flex-col gap-1.5 font-stamp text-xs text-white/75 bg-black/35 rounded-xl p-3"
+          className="fixed top-16 sm:top-4 right-3 sm:right-4 z-40 flex flex-col gap-1.5 font-stamp text-[0.68rem] sm:text-xs text-white/75 bg-black/35 rounded-xl p-2.5 sm:p-3"
           style={{ direction: 'rtl' }}
         >
           {(
