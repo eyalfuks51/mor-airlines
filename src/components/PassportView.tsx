@@ -1,5 +1,5 @@
 import { ReactNode, useCallback, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Destination, DestinationState } from '../data/destinations';
 import { usePassportStore } from '../store/passportStore';
 import { seedDestinations } from '../data/destinations';
@@ -52,9 +52,12 @@ const PAGE_COPY: Record<PassportPage, { label: string; tabLabel: string; subtitl
   },
 };
 
+const revealEase = [0.22, 1, 0.36, 1] as const;
+
 export default function PassportView({ destinations, onBack }: Props) {
   const { setDestState, toggleStarred, setTravelDate, setVisitedDate, setPersonalNote, updateDestination, deleteDestination } =
     usePassportStore();
+  const reduceMotion = Boolean(useReducedMotion());
 
   const [activePage, setActivePage] = useState<PassportPage>('all');
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -181,13 +184,17 @@ export default function PassportView({ destinations, onBack }: Props) {
         </section>
 
         <nav className="passport-page-tabs" aria-label="עמודי הדרכון">
-          {(['all', 'visited', 'booked', 'dream', 'starred'] as PassportPage[]).map(page => (
-            <button
+          {(['all', 'visited', 'booked', 'dream', 'starred'] as PassportPage[]).map((page, index) => (
+            <motion.button
               key={page}
               type="button"
+              data-passport-motion="tab"
               onClick={() => setActivePage(page)}
               className={activePage === page ? 'is-active' : undefined}
               aria-pressed={activePage === page}
+              initial={reduceMotion ? false : { opacity: 0, y: -10, filter: 'blur(8px)' }}
+              animate={reduceMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ delay: index * 0.045, duration: 0.28, ease: revealEase }}
             >
               <span>{PAGE_COPY[page].tabLabel}</span>
               <small>
@@ -201,7 +208,7 @@ export default function PassportView({ destinations, onBack }: Props) {
                   ? dream.length
                   : starred.length}
               </small>
-            </button>
+            </motion.button>
           ))}
         </nav>
 
@@ -222,9 +229,10 @@ export default function PassportView({ destinations, onBack }: Props) {
             <div className="passport-stamp-grid">
               {pageDestinations.map((dest, index) => (
                 <PassportStamp
-                  key={dest.id}
+                  key={`${activePage}-${dest.id}`}
                   dest={dest}
                   index={index}
+                  reduceMotion={reduceMotion}
                   onOpen={() => setSelectedId(dest.id)}
                   onToggleStar={() => toggleStarred(dest.id)}
                 />
@@ -276,19 +284,28 @@ function PassportStat({ label, value, tone }: { label: string; value: number; to
 }
 
 function PassportStamp({
-  dest, index, onOpen, onToggleStar,
+  dest, index, reduceMotion, onOpen, onToggleStar,
 }: {
   dest: Destination;
   index: number;
+  reduceMotion: boolean;
   onOpen: () => void;
   onToggleStar: () => void;
 }) {
   const state = STATE_COPY[dest.state];
   const dateLabel = getDateLabel(dest);
   const tilt = `${((index % 5) - 2) * 0.45}deg`;
+  const revealDelay = Math.min(index, 12) * 0.035;
 
   return (
-    <article className="passport-stamp" style={{ '--stamp-tilt': tilt } as React.CSSProperties}>
+    <motion.article
+      className="passport-stamp"
+      data-passport-motion="stamp"
+      style={{ '--stamp-tilt': tilt } as React.CSSProperties}
+      initial={reduceMotion ? false : { opacity: 0, y: -14, filter: 'blur(10px)' }}
+      animate={reduceMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
+      transition={{ delay: revealDelay, duration: 0.34, ease: revealEase }}
+    >
       <button
         type="button"
         className="passport-stamp-favorite"
@@ -312,7 +329,7 @@ function PassportStamp({
           {dest.personalNote ? ' · יש זיכרון' : ''}
         </span>
       </button>
-    </article>
+    </motion.article>
   );
 }
 
