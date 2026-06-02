@@ -352,6 +352,8 @@ html, body, #root {
 }
 
 .passport-page-tabs button {
+  position: relative;
+  overflow: hidden;
   min-width: 0;
   min-height: 3rem;
   display: flex;
@@ -364,9 +366,12 @@ html, body, #root {
   background: color-mix(in oklch, var(--paper) 7%, transparent);
   color: color-mix(in oklch, var(--paper) 72%, transparent);
   transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  will-change: transform, opacity, filter;
 }
 
 .passport-page-tabs button span {
+  position: relative;
+  z-index: 1;
   max-width: 100%;
   overflow: hidden;
   font-size: 0.78rem;
@@ -376,9 +381,24 @@ html, body, #root {
 }
 
 .passport-page-tabs button small {
+  position: relative;
+  z-index: 1;
   color: color-mix(in oklch, var(--gold) 75%, transparent);
   font-family: var(--font-stamp);
   font-size: 0.72rem;
+}
+
+.passport-tab-indicator {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in oklch, var(--gold) 34%, transparent), transparent 62%),
+    color-mix(in oklch, var(--gold) 16%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--gold) 45%, transparent),
+    0 8px 22px color-mix(in oklch, var(--gold) 14%, transparent);
+  pointer-events: none;
 }
 
 .passport-page-tabs button.is-active {
@@ -429,6 +449,10 @@ html, body, #root {
     color-mix(in oklch, var(--paper) 76%, white 24%);
   transform: rotate(var(--stamp-tilt));
   transition: transform 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.passport-stamp[data-passport-reveal="true"] {
+  will-change: transform, opacity, filter;
 }
 
 .passport-stamp:hover {

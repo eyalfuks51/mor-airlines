@@ -52,7 +52,7 @@ const PAGE_COPY: Record<PassportPage, { label: string; tabLabel: string; subtitl
   },
 };
 
-const revealEase = [0.22, 1, 0.36, 1] as const;
+const revealEase = [0.28, 0.72, 0.18, 1] as const;
 
 export default function PassportView({ destinations, onBack }: Props) {
   const { setDestState, toggleStarred, setTravelDate, setVisitedDate, setPersonalNote, updateDestination, deleteDestination } =
@@ -194,8 +194,16 @@ export default function PassportView({ destinations, onBack }: Props) {
               aria-pressed={activePage === page}
               initial={reduceMotion ? false : { opacity: 0, y: -10, filter: 'blur(8px)' }}
               animate={reduceMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
-              transition={{ delay: index * 0.045, duration: 0.28, ease: revealEase }}
+              transition={{ delay: index * 0.085, duration: 0.52, ease: revealEase }}
             >
+              {activePage === page && (
+                <motion.i
+                  aria-hidden="true"
+                  className="passport-tab-indicator"
+                  layoutId="passport-tab-indicator"
+                  transition={{ duration: 0.42, ease: revealEase }}
+                />
+              )}
               <span>{PAGE_COPY[page].tabLabel}</span>
               <small>
                 {page === 'all'
@@ -229,7 +237,7 @@ export default function PassportView({ destinations, onBack }: Props) {
             <div className="passport-stamp-grid">
               {pageDestinations.map((dest, index) => (
                 <PassportStamp
-                  key={`${activePage}-${dest.id}`}
+                  key={`${activePage}-${dest.id}-${index}`}
                   dest={dest}
                   index={index}
                   reduceMotion={reduceMotion}
@@ -295,16 +303,24 @@ function PassportStamp({
   const state = STATE_COPY[dest.state];
   const dateLabel = getDateLabel(dest);
   const tilt = `${((index % 5) - 2) * 0.45}deg`;
-  const revealDelay = Math.min(index, 12) * 0.035;
+  const shouldAnimate = !reduceMotion && index < 24;
+  const revealDelay = Math.min(index, 10) * 0.075;
 
   return (
     <motion.article
       className="passport-stamp"
       data-passport-motion="stamp"
+      data-passport-reveal={shouldAnimate ? 'true' : undefined}
       style={{ '--stamp-tilt': tilt } as React.CSSProperties}
-      initial={reduceMotion ? false : { opacity: 0, y: -14, filter: 'blur(10px)' }}
-      animate={reduceMotion ? undefined : { opacity: 1, y: 0, filter: 'blur(0px)' }}
-      transition={{ delay: revealDelay, duration: 0.34, ease: revealEase }}
+      initial={shouldAnimate ? { opacity: 0, y: -26, scale: 0.94, filter: 'blur(18px)' } : false}
+      animate={shouldAnimate ? { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' } : undefined}
+      transition={{
+        delay: revealDelay,
+        duration: 0.92,
+        ease: revealEase,
+        opacity: { delay: revealDelay, duration: 0.82, ease: 'linear' },
+        filter: { delay: revealDelay, duration: 0.9, ease: 'linear' },
+      }}
     >
       <button
         type="button"
