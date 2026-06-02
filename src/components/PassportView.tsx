@@ -52,6 +52,27 @@ const PAGE_COPY: Record<PassportPage, { label: string; tabLabel: string; subtitl
   },
 };
 
+const PASSPORT_MEMORY_PHOTOS = [
+  {
+    src: '/passport/memory-lake.webp',
+    alt: 'מור ואייל ליד מים בתוך מסגרת דרכון של מור איירליינס',
+    label: 'חותמת זוגית',
+    className: 'is-wide',
+  },
+  {
+    src: '/passport/memory-portrait.webp',
+    alt: 'מור ואייל בתמונת דרכון זוגית בצבעי מור איירליינס',
+    label: 'נוסעים רשומים',
+    className: 'is-portrait',
+  },
+  {
+    src: '/passport/memory-night.webp',
+    alt: 'מור ואייל בתמונה לילית עם מסגרת טיסה זהובה',
+    label: 'יעד שמחכה',
+    className: 'is-night',
+  },
+] as const;
+
 const revealEase = [0.28, 0.72, 0.18, 1] as const;
 
 export default function PassportView({ destinations, onBack }: Props) {
@@ -229,6 +250,15 @@ export default function PassportView({ destinations, onBack }: Props) {
             <span className="passport-page-number" dir="ltr">P. {pageNumber(activePage)}</span>
           </div>
 
+          <PassportMemoryRunway
+            activePage={activePage}
+            destinations={destinations}
+            visited={visited}
+            booked={booked}
+            dream={dream}
+            starred={starred}
+          />
+
           {pageDestinations.length === 0 ? (
             <p className="passport-empty text-sm text-center py-8">
               {PAGE_COPY[activePage].empty}
@@ -278,6 +308,82 @@ export default function PassportView({ destinations, onBack }: Props) {
           />
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+function PassportMemoryRunway({
+  activePage,
+  destinations,
+  visited,
+  booked,
+  dream,
+  starred,
+}: {
+  activePage: PassportPage;
+  destinations: Destination[];
+  visited: Destination[];
+  booked: Destination[];
+  dream: Destination[];
+  starred: Destination[];
+}) {
+  const activeFocus = firstDestination(
+    activePage === 'visited' ? visited[0] : undefined,
+    activePage === 'booked' ? booked[0] : undefined,
+    activePage === 'dream' ? dream[0] : undefined,
+    activePage === 'starred' ? starred[0] : undefined,
+    destinations[0],
+  );
+  const farDream = dream.find(dest => dest.vibeTags.includes('far'));
+  const routeFrames = [
+    firstDestination(activeFocus, visited[0], booked[0], destinations[0]),
+    firstDestination(booked[0], starred.find(dest => dest.state !== 'visited'), activeFocus, destinations[1]),
+    firstDestination(farDream, dream[0], starred[0], activeFocus, destinations[2]),
+  ];
+  const activeCount =
+    activePage === 'all'
+      ? destinations.length
+      : activePage === 'visited'
+      ? visited.length
+      : activePage === 'booked'
+      ? booked.length
+      : activePage === 'dream'
+      ? dream.length
+      : starred.length;
+
+  if (!destinations.length) return null;
+
+  return (
+    <div className="passport-memory-runway" aria-label="תמונות ויעדים בדרכון">
+      <div className="passport-memory-manifest">
+        <span className="font-stamp">{PAGE_COPY[activePage].label}</span>
+        <strong>{activeCount} יעדים</strong>
+        <small dir="ltr">MOR AIRLINES VISA RUN</small>
+      </div>
+
+      <div className="passport-memory-track" aria-hidden="false">
+        {PASSPORT_MEMORY_PHOTOS.map((photo, index) => (
+          <figure key={photo.src} className={`passport-memory-frame ${photo.className}`}>
+            <img src={photo.src} alt={photo.alt} loading="lazy" decoding="async" />
+            <figcaption>
+              <span>{photo.label}</span>
+              {routeFrames[index] && (
+                <>
+                  <strong>{routeFrames[index].nameHe}</strong>
+                  <small dir="ltr">{routeFrames[index].nameEn}</small>
+                </>
+              )}
+            </figcaption>
+          </figure>
+        ))}
+      </div>
+
+      <div className="passport-memory-route">
+        <span className="artifact-label">נתיב פעיל</span>
+        <strong>{activeFocus?.nameHe ?? 'כל הדרכון'}</strong>
+        {activeFocus && <i className={`stamp-pill ${STATE_COPY[activeFocus.state].className}`}>{STATE_COPY[activeFocus.state].label}</i>}
+      </div>
+      <span className="passport-memory-scan" aria-hidden="true" />
     </div>
   );
 }
@@ -515,6 +621,10 @@ function FieldRow({ label, children }: { label: string; children: ReactNode }) {
       {children}
     </div>
   );
+}
+
+function firstDestination(...items: Array<Destination | undefined>): Destination | undefined {
+  return items.find((item): item is Destination => Boolean(item));
 }
 
 function getDateLabel(dest: Destination) {

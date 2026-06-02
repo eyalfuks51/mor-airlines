@@ -433,6 +433,240 @@ html, body, #root {
   font-size: 0.78rem;
 }
 
+.passport-memory-runway {
+  position: relative;
+  isolation: isolate;
+  min-height: 13.4rem;
+  overflow: hidden;
+  margin: -0.15rem 0 1rem;
+  border: 1px solid color-mix(in oklch, var(--gold) 36%, var(--ink) 22%);
+  border-radius: 0.62rem;
+  color: var(--paper);
+  background:
+    radial-gradient(circle at 12% 18%, color-mix(in oklch, var(--gold) 20%, transparent), transparent 31%),
+    linear-gradient(135deg, oklch(0.17 0.045 246), oklch(0.13 0.035 178) 58%, oklch(0.18 0.045 54));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklch, var(--paper) 8%, transparent),
+    0 14px 30px color-mix(in oklch, oklch(0.08 0.02 240) 34%, transparent);
+}
+
+.passport-memory-runway::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(90deg, color-mix(in oklch, var(--gold) 13%, transparent) 0 1px, transparent 1px 100%),
+    repeating-linear-gradient(0deg, color-mix(in oklch, var(--paper) 4%, transparent) 0 1px, transparent 1px 18px),
+    repeating-linear-gradient(90deg, color-mix(in oklch, var(--gold) 7%, transparent) 0 1px, transparent 1px 18px);
+  opacity: 0.58;
+  pointer-events: none;
+}
+
+.passport-memory-runway::after {
+  content: "";
+  position: absolute;
+  inset: 0.45rem;
+  z-index: 1;
+  border: 1px solid color-mix(in oklch, var(--gold) 28%, transparent);
+  border-radius: 0.42rem;
+  pointer-events: none;
+}
+
+.passport-memory-track {
+  position: absolute;
+  inset: 0.7rem;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(6.2rem, 0.68fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 0.42rem;
+}
+
+.passport-memory-frame {
+  --memory-tilt: -0.7deg;
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklch, var(--gold) 40%, transparent);
+  border-radius: 0.42rem;
+  background: color-mix(in oklch, var(--night) 82%, var(--gold) 18%);
+  box-shadow: 0 10px 24px color-mix(in oklch, oklch(0.07 0.02 240) 38%, transparent);
+  transform: translateY(0) rotate(var(--memory-tilt));
+  animation: passport-photo-float 8.6s ease-in-out infinite;
+}
+
+.passport-memory-frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 42%, color-mix(in oklch, var(--night) 78%, transparent)),
+    radial-gradient(circle at 80% 16%, color-mix(in oklch, var(--gold) 24%, transparent), transparent 18%);
+  pointer-events: none;
+}
+
+.passport-memory-frame img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  opacity: 0.84;
+  filter: saturate(1.06) contrast(1.05);
+}
+
+.passport-memory-frame figcaption {
+  position: absolute;
+  right: 0.42rem;
+  bottom: 0.42rem;
+  left: 0.42rem;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.05rem;
+  border: 1px solid color-mix(in oklch, var(--gold) 30%, transparent);
+  border-radius: 0.36rem;
+  padding: 0.34rem 0.42rem;
+  background: color-mix(in oklch, var(--night) 82%, oklch(0.18 0.045 54) 18%);
+}
+
+.passport-memory-frame figcaption span,
+.passport-memory-frame figcaption small {
+  overflow: hidden;
+  color: color-mix(in oklch, var(--gold) 86%, var(--paper) 14%);
+  font-family: var(--font-stamp);
+  font-size: 0.62rem;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passport-memory-frame figcaption strong {
+  overflow: hidden;
+  color: var(--paper);
+  font-size: 0.83rem;
+  font-weight: 800;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passport-memory-frame:not(.is-wide) figcaption small {
+  display: none;
+}
+
+.passport-memory-frame.is-wide {
+  grid-row: 1 / 3;
+}
+
+.passport-memory-frame.is-portrait {
+  --memory-tilt: 1.1deg;
+  animation-delay: -2.2s;
+}
+
+.passport-memory-frame.is-portrait img {
+  object-position: 50% 34%;
+}
+
+.passport-memory-frame.is-night {
+  --memory-tilt: -1deg;
+  animation-delay: -4.8s;
+}
+
+.passport-memory-manifest,
+.passport-memory-route {
+  position: absolute;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 0.36rem;
+  max-width: calc(100% - 1.4rem);
+  border: 1px solid color-mix(in oklch, var(--gold) 34%, transparent);
+  border-radius: 0.36rem;
+  background: color-mix(in oklch, var(--night) 88%, oklch(0.18 0.045 54) 12%);
+  color: var(--paper);
+  padding: 0.32rem 0.45rem;
+  box-shadow: 0 10px 22px color-mix(in oklch, oklch(0.07 0.02 240) 34%, transparent);
+}
+
+.passport-memory-manifest {
+  top: 0.58rem;
+  right: 0.58rem;
+  max-width: 52%;
+}
+
+.passport-memory-manifest span,
+.passport-memory-manifest small,
+.passport-memory-route span {
+  color: color-mix(in oklch, var(--gold) 78%, var(--paper) 22%);
+  font-size: 0.66rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.passport-memory-manifest strong,
+.passport-memory-route strong {
+  overflow: hidden;
+  color: var(--paper);
+  font-size: 0.78rem;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.passport-memory-manifest small {
+  display: none;
+  font-family: var(--font-stamp);
+}
+
+.passport-memory-route {
+  left: 0.58rem;
+  top: 0.58rem;
+  max-width: 44%;
+}
+
+.passport-memory-route .stamp-pill {
+  flex-shrink: 0;
+  font-style: normal;
+  font-size: 0.62rem;
+  transform: rotate(-1deg);
+}
+
+.passport-memory-scan {
+  position: absolute;
+  inset-block: 0;
+  z-index: 3;
+  width: 32%;
+  background: linear-gradient(90deg, transparent, color-mix(in oklch, var(--gold) 20%, transparent), transparent);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-140%);
+  animation: passport-runway-scan 7.8s ease-in-out infinite;
+}
+
+@keyframes passport-photo-float {
+  0%, 100% {
+    transform: translateY(0) rotate(var(--memory-tilt));
+  }
+  50% {
+    transform: translateY(-0.28rem) rotate(var(--memory-tilt));
+  }
+}
+
+@keyframes passport-runway-scan {
+  0%, 12% {
+    opacity: 0;
+    transform: translateX(-140%);
+  }
+  38%, 56% {
+    opacity: 0.82;
+  }
+  82%, 100% {
+    opacity: 0;
+    transform: translateX(340%);
+  }
+}
+
 .passport-stamp-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -797,6 +1031,13 @@ html, body, #root {
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .passport-memory-frame,
+  .passport-memory-scan {
+    animation: none;
+  }
+}
+
 @media (min-width: 760px) {
   .passport-shell {
     display: grid;
@@ -827,6 +1068,36 @@ html, body, #root {
 
   .passport-stamp-page {
     grid-area: stamps;
+  }
+
+  .passport-memory-runway {
+    min-height: 12.2rem;
+  }
+
+  .passport-memory-track {
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.72fr) minmax(0, 0.95fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 0.5rem;
+  }
+
+  .passport-memory-frame.is-wide {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .passport-memory-frame.is-portrait {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .passport-memory-frame.is-night {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .passport-memory-manifest small,
+  .passport-memory-frame:not(.is-wide) figcaption small {
+    display: block;
   }
 
   .passport-stamp-grid {
