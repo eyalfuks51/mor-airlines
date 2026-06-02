@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { Destination, VibeTag } from '../data/destinations';
 import { geocodePlace } from '../hooks/geocoding';
+import { REGULAR_VIBE_TAGS, isRegularVibeTag } from '../utils/destinationFilters';
 
 const VIBE_LABELS: Record<VibeTag, string> = {
   beach: 'חוף',
@@ -11,8 +12,6 @@ const VIBE_LABELS: Record<VibeTag, string> = {
   far: 'רחוק',
   near: 'קרוב',
 };
-
-const ALL_TAGS: VibeTag[] = ['beach', 'city', 'adventure', 'food', 'far', 'near'];
 
 export interface ModalFormData {
   nameHe: string;
@@ -43,7 +42,9 @@ export default function DestinationModal({ mode, destination, onClose, onSave, o
   const [localDish, setLocalDish] = useState(destination?.localDish ?? '');
   const [bestSeason, setBestSeason] = useState(destination?.bestSeason ?? '');
   const [whyHere, setWhyHere] = useState(destination?.whyHere ?? '');
-  const [vibeTags, setVibeTags] = useState<VibeTag[]>(destination?.vibeTags ?? []);
+  const [vibeTags, setVibeTags] = useState<VibeTag[]>(
+    destination?.vibeTags.filter(isRegularVibeTag) ?? [],
+  );
   const [latStr, setLatStr] = useState(destination?.lat?.toString() ?? '');
   const [lngStr, setLngStr] = useState(destination?.lng?.toString() ?? '');
   const [geoStatus, setGeoStatus] = useState<GeoStatus>('idle');
@@ -277,7 +278,7 @@ export default function DestinationModal({ mode, destination, onClose, onSave, o
           <div>
             <p className="font-stamp text-white/50 text-xs mb-2">תגיות</p>
             <div className="flex flex-wrap gap-2">
-              {ALL_TAGS.map(tag => (
+              {REGULAR_VIBE_TAGS.map(tag => (
                 <button
                   key={tag}
                   type="button"

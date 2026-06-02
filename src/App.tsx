@@ -12,6 +12,7 @@ import { Destination, DestinationState, VibeTag } from './data/destinations';
 import { usePassportStore, mergeDestinations } from './store/passportStore';
 import { fetchWikiData } from './hooks/wikiData';
 import { useSupabaseSync } from './hooks/useSupabaseSync';
+import { matchesVibeFilters } from './utils/destinationFilters';
 
 type AppView = 'globe' | 'passport';
 
@@ -41,7 +42,7 @@ export default function App() {
 
   const filteredDestinations = useMemo(() => {
     return destinations.filter(d => {
-      const vibeMatch = activeVibes.length === 0 || activeVibes.some(v => d.vibeTags.includes(v));
+      const vibeMatch = matchesVibeFilters(d, activeVibes);
       const stateMatch = activeState === 'all' || d.state === activeState;
       return vibeMatch && stateMatch;
     });
