@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Destination, DestinationState } from '../data/destinations';
 import { usePassportStore } from '../store/passportStore';
-import { fetchWikiData } from '../hooks/wikiData';
+import { fetchWikiData, shouldFetchDestinationMedia } from '../hooks/wikiData';
 
 interface Props {
   destination: Destination;
@@ -31,7 +31,7 @@ export default function BoardingPass({ destination, onReroll, onSave, onShare, o
     setSummaryOpen(false);
     setSaveState('idle');
 
-    if (destination.imageUrl || destination.wikiSummary) {
+    if (!shouldFetchDestinationMedia(destination)) {
       setWiki({
         summary: destination.wikiSummary ?? '',
         imageUrl: destination.imageUrl ?? null,
@@ -41,19 +41,23 @@ export default function BoardingPass({ destination, onReroll, onSave, onShare, o
     }
 
     setWikiLoading(true);
-    setWiki(null);
+    setWiki({ summary: destination.wikiSummary ?? '', imageUrl: null });
     fetchWikiData(destination.nameEn)
       .then((data) => {
         const imageUrl = data?.imageUrl ?? null;
-        const wikiSummary = data?.wikiSummary ?? '';
+        const wikiSummary = data?.wikiSummary || destination.wikiSummary || '';
         setWiki({ summary: wikiSummary, imageUrl });
-        updateDestination(destination.id, { imageUrl: imageUrl ?? undefined, wikiSummary: wikiSummary || undefined });
+
+        const fields: Partial<Destination> = {};
+        if (imageUrl && imageUrl !== destination.imageUrl) fields.imageUrl = imageUrl;
+        if (wikiSummary && wikiSummary !== destination.wikiSummary) fields.wikiSummary = wikiSummary;
+        if (Object.keys(fields).length > 0) updateDestination(destination.id, fields);
       })
       .catch(() => {
-        setWiki({ summary: '', imageUrl: null });
+        setWiki({ summary: destination.wikiSummary ?? '', imageUrl: null });
       })
       .finally(() => setWikiLoading(false));
-  }, [destination.id, destination.imageUrl, destination.wikiSummary, updateDestination]);
+  }, [destination.id, destination.imageUrl, destination.nameEn, destination.wikiSummary, updateDestination]);
 
   const handleSaveChoice = (state: DestinationState) => {
     onSave(state);

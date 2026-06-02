@@ -1,3 +1,5 @@
+import type { Destination } from '../data/destinations';
+
 export interface WikiData {
   imageUrl: string | null;
   wikiSummary: string;
@@ -14,22 +16,40 @@ async function fetchPexelsImage(query: string): Promise<string | null> {
   }
 }
 
-async function fetchWikiSummary(nameEn: string): Promise<string> {
+async function fetchWikipediaData(nameEn: string): Promise<WikiData> {
   try {
     const slug = encodeURIComponent(nameEn.replace(/ /g, '_'));
     const res = await fetch(`https://en.wikipedia.org/api/rest_v1/page/summary/${slug}`);
-    if (!res.ok) return '';
+    if (!res.ok) return { imageUrl: null, wikiSummary: '' };
     const data = await res.json();
-    return data.extract || '';
+    return {
+      imageUrl: data.originalimage?.source ?? data.thumbnail?.source ?? null,
+      wikiSummary: data.extract || '',
+    };
   } catch {
-    return '';
+    return { imageUrl: null, wikiSummary: '' };
   }
 }
 
+function isWikipediaFallbackImage(imageUrl: string): boolean {
+  try {
+    return new URL(imageUrl).hostname === 'upload.wikimedia.org';
+  } catch {
+    return false;
+  }
+}
+
+export function shouldFetchDestinationMedia(destination: Pick<Destination, 'imageUrl'>): boolean {
+  return !destination.imageUrl || isWikipediaFallbackImage(destination.imageUrl);
+}
+
 export async function fetchWikiData(nameEn: string): Promise<WikiData | null> {
-  const [imageUrl, wikiSummary] = await Promise.all([
+  const [pexelsImageUrl, wikipediaData] = await Promise.all([
     fetchPexelsImage(nameEn),
-    fetchWikiSummary(nameEn),
+    fetchWikipediaData(nameEn),
   ]);
-  return { imageUrl, wikiSummary };
+  return {
+    imageUrl: pexelsImageUrl ?? wikipediaData.imageUrl,
+    wikiSummary: wikipediaData.wikiSummary,
+  };
 }
