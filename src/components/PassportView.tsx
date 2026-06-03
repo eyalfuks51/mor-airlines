@@ -176,7 +176,16 @@ export default function PassportView({ destinations, onBack }: Props) {
         <section className="passport-cover" aria-label="פרטי הדרכון">
           <div className="passport-cover-frame">
             <p className="font-stamp text-[color:var(--gold)] text-sm">MOR AIRLINES</p>
-            <div className="passport-emblem" aria-hidden="true">MA</div>
+            <div className="passport-emblem">
+              <img
+                src="/icon.png"
+                alt="Mor Airlines"
+                className="passport-emblem-logo"
+                width="512"
+                height="512"
+                decoding="async"
+              />
+            </div>
             <div>
               <p className="passport-cover-kicker">דרכון זוגי</p>
               <h2 className="font-airline text-3xl leading-none text-[color:var(--paper)]">מור ואייל</h2>

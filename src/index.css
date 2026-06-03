@@ -249,14 +249,28 @@ html, body, #root {
 .passport-emblem {
   width: 5.2rem;
   aspect-ratio: 1;
+  overflow: hidden;
   display: grid;
   place-items: center;
   border: 2px solid color-mix(in oklch, var(--gold) 72%, transparent);
   border-radius: 50%;
-  color: var(--gold);
-  font-family: var(--font-stamp);
-  font-size: 1.75rem;
-  box-shadow: inset 0 0 0 0.45rem color-mix(in oklch, var(--gold) 8%, transparent);
+  background:
+    radial-gradient(circle at 50% 42%, color-mix(in oklch, var(--gold) 14%, transparent), transparent 58%),
+    color-mix(in oklch, var(--night) 88%, black 12%);
+  box-shadow:
+    inset 0 0 0 0.42rem color-mix(in oklch, var(--gold) 8%, transparent),
+    0 0.9rem 2rem color-mix(in oklch, black 28%, transparent);
+}
+
+.passport-emblem-logo {
+  width: 100%;
+  height: 100%;
+  display: block;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 44%;
+  filter: saturate(1.08) contrast(1.04);
+  transform: scale(1.42);
 }
 
 .passport-id-strip {

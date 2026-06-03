@@ -19,6 +19,17 @@ test('passport tabs and stamps are wired to the staged reveal effect', async ({ 
   expect(duplicateKeyErrors).toEqual([]);
 });
 
+test('passport cover shows the Mor Airlines logo in the emblem seal', async ({ page }) => {
+  await page.goto('/');
+
+  await page.getByRole('button', { name: '📔 דרכון' }).click();
+
+  const emblem = page.locator('.passport-emblem');
+  await expect(emblem.locator('img[alt="Mor Airlines"]')).toBeVisible();
+  await expect(emblem.locator('img[alt="Mor Airlines"]')).toHaveAttribute('src', '/icon.png');
+  await expect(emblem).not.toHaveText('MA');
+});
+
 test('passport reveal remains visibly in motion long enough to notice', async ({ page }) => {
   await page.goto('/');
 
