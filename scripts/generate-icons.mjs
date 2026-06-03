@@ -1,15 +1,22 @@
 import sharp from 'sharp';
-import { readFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
+const sourceLogo = join(root, 'public', 'mor-airlines-logo.png');
 
-const svg = readFileSync(join(root, 'public', 'icon.svg'));
+const generateIcon = (size, filename) =>
+  sharp(sourceLogo)
+    .resize(size, size, { fit: 'cover', position: 'center' })
+    .png()
+    .toFile(join(root, 'public', filename));
 
-await sharp(svg).resize(512, 512).png().toFile(join(root, 'public', 'pwa-512.png'));
-await sharp(svg).resize(192, 192).png().toFile(join(root, 'public', 'pwa-192.png'));
-await sharp(svg).resize(180, 180).png().toFile(join(root, 'public', 'apple-touch-icon.png'));
+await Promise.all([
+  generateIcon(512, 'icon.png'),
+  generateIcon(512, 'pwa-512.png'),
+  generateIcon(192, 'pwa-192.png'),
+  generateIcon(180, 'apple-touch-icon.png'),
+]);
 
 console.log('Icons generated successfully.');

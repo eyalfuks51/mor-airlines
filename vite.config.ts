@@ -16,7 +16,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
-      includeAssets: ['apple-touch-icon.png', 'icon.svg'],
+      includeAssets: ['apple-touch-icon.png', 'icon.png', 'mor-airlines-logo.png'],
       workbox: {
         maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff,woff2}'],
