@@ -247,20 +247,34 @@ html, body, #root {
 }
 
 .passport-emblem {
-  width: min(14rem, 88%);
+  position: relative;
+  width: min(14.2rem, 90%);
   overflow: visible;
   display: grid;
   place-items: center;
-  filter: drop-shadow(0 1rem 1.8rem color-mix(in oklch, black 28%, transparent));
+  padding: 0.1rem 0;
+}
+
+.passport-emblem::before {
+  content: "";
+  position: absolute;
+  inset: 12% 4% 8%;
+  z-index: -1;
+  border-radius: 999px;
+  background:
+    radial-gradient(ellipse at 50% 48%, color-mix(in oklch, var(--gold) 16%, transparent), transparent 63%);
+  opacity: 0.7;
 }
 
 .passport-emblem-logo {
   width: 100%;
   height: auto;
   display: block;
-  border-radius: 0.35rem;
   object-fit: contain;
-  filter: saturate(1.08) contrast(1.04);
+  filter:
+    saturate(1.08)
+    contrast(1.04)
+    drop-shadow(0 0.65rem 1.25rem color-mix(in oklch, black 28%, transparent));
 }
 
 .passport-id-strip {

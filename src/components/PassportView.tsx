@@ -177,7 +177,7 @@ export default function PassportView({ destinations, onBack }: Props) {
           <div className="passport-cover-frame">
             <div className="passport-emblem">
               <img
-                src="/mor-airlines-logo.png"
+                src="/mor-airlines-logo-transparent.png"
                 alt="Mor Airlines"
                 className="passport-emblem-logo"
                 width="1254"
